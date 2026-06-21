@@ -1,7 +1,9 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Globe, Users, Trophy, Award, Heart, Shield, Star, Zap } from 'lucide-react';
+import { TrendingUp, Briefcase, BookOpen, ArrowRight } from 'lucide-react';
 import { useCounter } from '@/hooks/use-counter';
+import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
 
 function AnimatedCounter({ end, suffix = "", prefix = "" }: { end: number, suffix?: string, prefix?: string }) {
   const ref = useRef(null);
@@ -9,152 +11,150 @@ function AnimatedCounter({ end, suffix = "", prefix = "" }: { end: number, suffi
   const count = useCounter(end, 2000, isInView);
 
   return (
-    <span ref={ref} className="font-serif text-5xl font-bold gradient-text">
+    <span ref={ref} className="font-serif text-5xl md:text-6xl font-bold gradient-text">
       {prefix}{count}{suffix}
     </span>
   );
 }
 
 export default function About() {
-  const timeline = [
-    { year: "2015", title: "Foundation", description: "IICA was established with a vision to organize the unorganized sector of classical arts." },
-    { year: "2018", title: "Global Expansion", description: "Opened first international chapters in London and New York." },
-    { year: "2021", title: "Digital Revolution", description: "Launched the digital platform connecting artists worldwide." },
-    { year: "2024", title: "Legacy Program", description: "Introduced the SEO-powered artist branding initiatives." },
-  ];
-
-  const values = [
-    { icon: <Heart className="w-8 h-8 text-[#C13584]" />, title: "Authenticity", desc: "Preserving the true essence of Indian classical arts." },
-    { icon: <Shield className="w-8 h-8 text-[#833AB4]" />, title: "Integrity", desc: "Building long-term legacy over short-term gains." },
-    { icon: <Star className="w-8 h-8 text-[#E1306C]" />, title: "Excellence", desc: "Premium quality in every aspect of promotion." },
-    { icon: <Zap className="w-8 h-8 text-[#d4a853]" />, title: "Innovation", desc: "Modern technology meeting ancient traditions." },
+  const pillars = [
+    {
+      icon: <TrendingUp className="w-8 h-8 text-[#C13584]" />,
+      title: "GROW TOGETHER",
+      desc: "Celebrate good music, new music, all musicians, sound engineers, and artists engaged in production of audio/visual media in Arts & Entertainment",
+    },
+    {
+      icon: <Briefcase className="w-8 h-8 text-[#833AB4]" />,
+      title: "BRANDING WITH PURPOSE",
+      desc: "Nurture the culture of branding with purpose, for sustainable benefits to artists, educators, students, and the community at large",
+    },
+    {
+      icon: <BookOpen className="w-8 h-8 text-[#d4a853]" />,
+      title: "LEARNING BUSINESS CONCEPTS",
+      desc: "Lifelong learning attitude is KEY to growth of any individual, artist, nation. Our national & international campaigns are designed for premium artists eager to make significant leaps in business",
+    },
   ];
 
   return (
     <div className="bg-black text-white min-h-screen pt-20">
-      {/* Hero */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[#0a0a0a]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#833AB4]/20 via-[#C13584]/10 to-transparent pointer-events-none" />
-        <div className="container relative z-10 mx-auto px-6 text-center max-w-4xl">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-serif text-5xl md:text-7xl font-bold mb-6"
-          >
-            Empowering the <br/><span className="gradient-text">Cultural Guardians</span>
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-gray-300"
-          >
-            IICA is dedicated to elevating Indian classical and traditional arts on the global stage through premium branding and strategic collaborations.
-          </motion.p>
+
+      {/* Mission Header */}
+      <section className="py-20 border-b border-white/8">
+        <div className="container mx-auto px-6 max-w-4xl">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-gray-300 text-lg leading-relaxed mb-8">
+              We are on a mission to help <strong className="text-white">1 MILLION artists</strong> to achieve their professional goals, by using innovative branding tools designed in a structured infrastructure powered by technology, leading to a steady growth in their brand values. We design growth strategies uniquely suited to individual artists, in order to offer them a world-class <strong className="gradient-text">LEGACY solution</strong> that lives beyond their lifetimes.
+            </p>
+            <p className="text-gray-400 leading-relaxed">
+              We are a team of trained music educators, technology leaders, digital marketing experts, copywriting specialists and branding coaches who achieved early success in helping performing arts professionals earn <strong className="text-white">40X more revenue</strong>, on a regular basis. Buy the book available on Amazon and Flipkart, written by our CEO — Reshma Patra, to learn about the proven methods and scientific insights that artists and educators use, to pursue artistic fulfillment and achieve financial goals.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Impact Counters */}
-      <section className="py-20 border-y border-white/10 bg-black/50">
+      {/* Stats */}
+      <section className="py-16 bg-[#0a0a0a] border-b border-white/8">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-            <div>
-              <AnimatedCounter end={500} suffix="+" />
-              <div className="text-gray-400 mt-2 font-medium tracking-wide uppercase text-sm">Artists Empowered</div>
-            </div>
-            <div>
-              <AnimatedCounter end={50} suffix="+" />
-              <div className="text-gray-400 mt-2 font-medium tracking-wide uppercase text-sm">Global Events</div>
-            </div>
-            <div>
-              <AnimatedCounter end={15} suffix="+" />
-              <div className="text-gray-400 mt-2 font-medium tracking-wide uppercase text-sm">Countries</div>
-            </div>
-            <div>
-              <AnimatedCounter end={8} suffix="+" />
-              <div className="text-gray-400 mt-2 font-medium tracking-wide uppercase text-sm">Major Awards</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="py-24 bg-[#0a0a0a]">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            <motion.div 
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="glass-card p-12 rounded-3xl"
-            >
-              <Globe className="w-16 h-16 text-[#833AB4] mb-8" />
-              <h2 className="font-serif text-3xl font-bold mb-6">Our Mission</h2>
-              <p className="text-gray-400 text-lg leading-relaxed">
-                To create a sustainable, premium ecosystem for Indian performing artists that bridges the gap between raw talent and global market demand through strategic branding, technology, and international networking.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center max-w-4xl mx-auto">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+              <AnimatedCounter end={5000} suffix="+" />
+              <div className="text-gray-400 mt-3 font-medium tracking-wide text-sm uppercase">Portfolio Design Projects</div>
             </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="glass-card p-12 rounded-3xl"
-            >
-              <Trophy className="w-16 h-16 text-[#C13584] mb-8" />
-              <h2 className="font-serif text-3xl font-bold mb-6">Our Vision</h2>
-              <p className="text-gray-400 text-lg leading-relaxed">
-                To see Indian classical arts recognized and compensated at par with Western classical arts globally, where our artists are celebrated as premium cultural ambassadors and thought leaders.
-              </p>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
+              <AnimatedCounter end={1500} suffix="+" />
+              <div className="text-gray-400 mt-3 font-medium tracking-wide text-sm uppercase">Educators' Consulting Projects</div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
+              <AnimatedCounter end={10} suffix="+" />
+              <div className="text-gray-400 mt-3 font-medium tracking-wide text-sm uppercase">Years of Experience</div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-24 bg-black">
-        <div className="container mx-auto px-6">
-          <h2 className="font-serif text-4xl font-bold mb-16 text-center">Core Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, i) => (
+      {/* Purpose Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-[#C13584] tracking-[0.25em] uppercase text-sm font-medium mb-4">Technology-Powered Legacy Solution</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
+              For Celebrating Indian Performing Arts & Culture
+            </h2>
+            <div className="w-20 h-[2px] gradient-bg mx-auto mt-6" />
+          </motion.div>
+
+          <div className="text-center mb-20">
+            <motion.h1
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="font-serif text-6xl md:text-8xl font-bold gradient-text"
+            >
+              PURPOSE
+            </motion.h1>
+            <div className="mt-2 text-gray-600 tracking-[0.5em] uppercase text-xs">Our Reason For Being</div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {pillars.map((pillar, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card p-8 rounded-2xl text-center hover:border-[#833AB4]/50 transition-colors"
+                transition={{ delay: i * 0.12 }}
+                className="border border-white/8 rounded-2xl p-8 bg-[#0a0a0a] hover:border-white/15 transition-colors"
               >
-                <div className="mb-6 flex justify-center">{value.icon}</div>
-                <h3 className="font-bold text-xl mb-3">{value.title}</h3>
-                <p className="text-gray-400 text-sm">{value.desc}</p>
+                <div className="mb-6">{pillar.icon}</div>
+                <h3 className="font-bold text-sm tracking-wider uppercase text-white mb-4">{pillar.title}</h3>
+                <p className="text-gray-400 leading-relaxed text-sm">{pillar.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="py-24 bg-[#0a0a0a]">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <h2 className="font-serif text-4xl font-bold mb-16 text-center">Our Journey</h2>
-          <div className="relative border-l-2 border-[#833AB4]/30 ml-4 md:ml-0 md:left-1/2">
-            {timeline.map((item, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className={`mb-12 relative pl-8 md:pl-0 md:w-1/2 ${i % 2 === 0 ? 'md:pr-12 md:text-right md:left-[-50%]' : 'md:pl-12 md:left-1/2'}`}
-              >
-                <div className="absolute w-4 h-4 rounded-full gradient-bg left-[-9px] md:left-[-9px] top-2 z-10" />
-                <span className="text-[#C13584] font-bold text-xl block mb-2">{item.year}</span>
-                <h3 className="font-serif text-2xl font-bold mb-3">{item.title}</h3>
-                <p className="text-gray-400">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* Vivekananda Quote */}
+      <section className="py-16 bg-[#0a0a0a] border-y border-white/8">
+        <div className="container mx-auto px-6 max-w-3xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-5xl text-[#833AB4] mb-6 font-serif">"</div>
+            <blockquote className="font-serif text-xl md:text-2xl italic text-[#C13584] leading-relaxed mb-6">
+              Whatever you think that you will be. If you think yourself weak, weak you will be; if you think yourself strong, strong you will be
+            </blockquote>
+            <cite className="text-gray-500 text-sm not-italic tracking-wider uppercase">— Swami Vivekananda</cite>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-24 bg-black">
+        <div className="container mx-auto px-6 max-w-3xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-gray-300 text-lg leading-relaxed mb-8">
+              If you are a professional performing artist eager to make steady progress in your career path ahead, we welcome you to explore our Premium Artist offerings. And, remember, <strong className="text-white">"Premium Artist"</strong> is nothing but a mindset. We help you set goals suited to your unique talents & we facilitate your journey in achieving those goals with confidence.{' '}
+              <strong className="text-white">Talk to us!</strong>
+            </p>
+            <Link href="/membership">
+              <Button className="gradient-bg text-white h-13 px-10 text-base hover:opacity-90 flex items-center gap-2 mx-auto">
+                Premium Artist Offerings <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
     </div>
