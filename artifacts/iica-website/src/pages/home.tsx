@@ -1,15 +1,56 @@
-import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'wouter';
-import { ChevronDown, TrendingUp, RefreshCw, Globe, Shield, Sparkles, ExternalLink } from 'lucide-react';
+import { ChevronDown, TrendingUp, RefreshCw, Globe, Shield, Sparkles, ExternalLink, Users } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import { ConsultationModal } from '@/components/sections/ConsultationModal';
 import { ArtistCard } from '@/components/sections/ArtistCard';
 import { ARTISTS } from '@/data/artists';
+import heroBg from '@assets/generated_images/indian_classical_music_concert_221b.png';
+
+/* ── Word-by-word animated heading ── */
+function AnimatedHeading({ text, className }: { text: string; className?: string }) {
+  const words = text.split(' ');
+  return (
+    <span className={className}>
+      {words.map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden mr-[0.22em] last:mr-0 align-bottom">
+          <motion.span
+            className="inline-block"
+            initial={{ y: '110%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{
+              duration: 0.65,
+              ease: [0.22, 1, 0.36, 1],
+              delay: 0.15 + i * 0.09,
+            }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ── Character-by-character shimmer line ── */
+function AnimatedSubline({ text, delay = 0.8 }: { text: string; delay?: number }) {
+  return (
+    <motion.p
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay }}
+    >
+      {text}
+    </motion.p>
+  );
+}
 
 export default function Home() {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const heroY = useTransform(scrollY, [0, 500], [0, 80]);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
 
   React.useEffect(() => {
@@ -21,90 +62,149 @@ export default function Home() {
   return (
     <div className="bg-black text-white min-h-screen">
 
-      {/* ── HERO ── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      {/* ════════════════════════════════
+          HERO — full photo + impact type
+          ════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-end overflow-hidden">
 
-        {/* Video background */}
+        {/* Background photo */}
         <div className="absolute inset-0 z-0">
-          {/* Replace src with the actual video file when available */}
-          {/* Video background — set src to your video file path when ready */}
-          {/* <video ref={videoRef} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-25" src="/hero-bg.mp4" /> */}
-          {/* Cinematic gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-10" />
-          {/* Ambient color orbs (always visible as fallback/supplement) */}
-          <motion.div
-            animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
-            transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
-            className="absolute top-1/3 left-1/4 w-[32rem] h-[32rem] rounded-full bg-[#833AB4] filter blur-[140px] opacity-25 z-0"
+          <img
+            src={heroBg}
+            alt="IICA — Indian classical music performance"
+            className="w-full h-full object-cover object-center"
           />
-          <motion.div
-            animate={{ x: [0, -80, 0], y: [0, -40, 0], scale: [1, 1.2, 1] }}
-            transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-            className="absolute bottom-1/3 right-1/4 w-[28rem] h-[28rem] rounded-full bg-[#E1306C] filter blur-[140px] opacity-18 z-0"
-          />
+          {/* Layered overlays for cinematic dark depth */}
+          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+          {/* Purple/pink ambient tint */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#833AB4]/15 via-transparent to-[#E1306C]/8" />
         </div>
 
-        {/* Hero content */}
-        <div className="container relative z-20 mx-auto px-6 text-center">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.15 } } }}
-            className="max-w-4xl mx-auto"
-          >
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-              className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-6"
-            >
-              International Indian Culture & Arts
-            </motion.p>
+        {/* Parallax content */}
+        <motion.div
+          style={{ opacity: heroOpacity, y: heroY }}
+          className="relative z-10 w-full pb-20 md:pb-28 pt-28"
+        >
+          <div className="container mx-auto px-6 md:px-10 lg:px-16">
 
-            <motion.h1
-              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
-              className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.08] mb-6"
-            >
-              Empowering Artists<br />
-              <span className="gradient-text">Beyond Performance</span>
-            </motion.h1>
-
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
-              className="text-base md:text-lg text-gray-400 mb-10 leading-relaxed max-w-2xl mx-auto"
-            >
-              IICA connects artists, educators, performers and creative leaders through branding, collaborations, opportunities and global recognition.
-            </motion.p>
-
+            {/* Social proof badge */}
             <motion.div
-              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              className="inline-flex items-center gap-2.5 bg-white/8 border border-white/12 backdrop-blur-sm rounded-full px-4 py-2 mb-10 text-sm text-white/80"
+            >
+              <Users className="w-4 h-4 text-[#C13584]" />
+              <span>Join <strong className="text-white">500+</strong> Indian artists on IICA</span>
+            </motion.div>
+
+            {/* Headline — EVEN Backstage style: huge, left-aligned, word-animated */}
+            <h1 className="font-serif font-bold leading-[0.95] tracking-tight mb-8 max-w-[14ch]">
+              <div className="text-[clamp(3.5rem,9vw,8rem)] text-white">
+                <AnimatedHeading text="Empowering" />
+              </div>
+              <div className="text-[clamp(3.5rem,9vw,8rem)] text-white">
+                <AnimatedHeading text="Artists" delay={0.1} />
+              </div>
+              <div className="text-[clamp(3rem,8vw,7rem)]">
+                <AnimatedHeading
+                  text="Beyond Performance"
+                  className="gradient-text"
+                />
+              </div>
+            </h1>
+
+            {/* Sub-copy */}
+            <AnimatedSubline
+              text="IICA connects artists, educators, performers and creative leaders through branding, collaborations, opportunities and global recognition."
+              delay={0.82}
+            />
+            <div className="text-gray-400 text-base md:text-lg leading-relaxed max-w-[52ch] mb-10 mt-0" />
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 1.0 }}
+              className="flex flex-col sm:flex-row items-start gap-4"
             >
               <Link href="/membership">
-                <Button className="gradient-bg text-white h-13 px-8 text-base rounded-md border-0 w-full sm:w-auto hover:opacity-90 transition-opacity">
-                  Become a Member
+                <Button className="gradient-bg text-white h-14 px-9 text-base rounded-md border-0 hover:opacity-90 transition-opacity font-medium">
+                  Become a Member →
                 </Button>
               </Link>
               <Link href="/artists">
-                <Button variant="outline" className="h-13 px-8 text-base rounded-md w-full sm:w-auto bg-transparent text-white border border-white/20 hover:border-white/40 hover:bg-white/5 transition-all">
+                <Button
+                  variant="outline"
+                  className="h-14 px-9 text-base rounded-md bg-transparent text-white border border-white/25 hover:border-white/50 hover:bg-white/6 transition-all font-medium"
+                >
                   Explore Artists
                 </Button>
               </Link>
             </motion.div>
-          </motion.div>
-        </div>
 
-        {/* Scroll indicator */}
+            {/* No card needed note */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.3 }}
+              className="text-gray-600 text-xs mt-4"
+            >
+              Free to explore. No commitment required.
+            </motion.p>
+          </div>
+        </motion.div>
+
+        {/* Scroll cue */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-600 z-20"
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white/30"
         >
-          <ChevronDown className="w-7 h-7" />
+          <ChevronDown className="w-6 h-6" />
         </motion.div>
       </section>
 
-      {/* ── FEATURE CARDS ── */}
-      <section className="py-24 bg-[#060606] border-t border-white/5">
+      {/* ════════════════════════════════
+          FEATURE HIGHLIGHTS — 4 tiles like EVEN
+          ════════════════════════════════ */}
+      <section className="border-b border-white/8 bg-[#080808]">
         <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/8">
+            {[
+              { icon: <TrendingUp className="w-5 h-5" />, title: "80% More Earnings", desc: "Proven artist revenue growth" },
+              { icon: <Sparkles className="w-5 h-5" />, title: "Premium Branding", desc: "SEO-powered life journeys" },
+              { icon: <Globe className="w-5 h-5" />, title: "Global Reach", desc: "International collaborations" },
+              { icon: <Shield className="w-5 h-5" />, title: "Legacy Program", desc: "Brand value beyond a lifetime" },
+            ].map((tile, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="px-6 py-7 flex flex-col gap-2"
+              >
+                <div className="text-[#C13584] mb-1">{tile.icon}</div>
+                <h4 className="font-semibold text-white text-sm">{tile.title}</h4>
+                <p className="text-gray-600 text-xs leading-relaxed">{tile.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════
+          FEATURE CARDS
+          ════════════════════════════════ */}
+      <section className="py-24 bg-[#060606]">
+        <div className="container mx-auto px-6">
+          <div className="mb-12">
+            <p className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-3">Explore</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-white">Start Your Journey</h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -117,7 +217,7 @@ export default function Home() {
                   <TrendingUp className="w-10 h-10 text-[#C13584] mb-6" />
                   <h3 className="font-serif text-3xl font-bold mb-4 text-white">Increase Earnings by 80%</h3>
                   <p className="text-gray-500 mb-8 text-base leading-relaxed">Leverage IICA's artist branding ecosystem to multiply your reach, fan base, and revenue streams. Data-driven, legacy-focused, results guaranteed.</p>
-                  <div className="flex items-center text-[#C13584] text-sm font-medium group-hover:gap-3 transition-all">
+                  <div className="flex items-center text-[#C13584] text-sm font-medium">
                     Explore <ExternalLink className="w-4 h-4 ml-2" />
                   </div>
                 </div>
@@ -146,13 +246,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── SERVICES / OFFERINGS ── */}
+      {/* ════════════════════════════════
+          OFFERINGS
+          ════════════════════════════════ */}
       <section className="py-24 bg-black border-t border-white/5">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <p className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-4">What We Offer</p>
+          <div className="mb-14">
+            <p className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-3">What We Offer</p>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">Our Offerings</h2>
-            <div className="w-12 h-[2px] gradient-bg mx-auto mt-6" />
+            <div className="w-12 h-[2px] gradient-bg mt-6" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
@@ -185,7 +287,11 @@ export default function Home() {
                 className="border border-white/8 rounded-2xl overflow-hidden bg-[#0a0a0a] hover:border-white/15 transition-colors group"
               >
                 <div className="aspect-video overflow-hidden bg-[#111]">
-                  <img src={service.img} alt={service.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-500" />
+                  <img
+                    src={service.img}
+                    alt={service.title}
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-500"
+                  />
                 </div>
                 <div className="p-8">
                   <div className="mb-5">{service.icon}</div>
@@ -196,7 +302,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-center">
+          <div>
             <ConsultationModal>
               <Button className="gradient-bg text-white h-13 px-10 text-base hover:opacity-90 transition-opacity">
                 Book a FREE Consultation
@@ -206,11 +312,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── ARTIST STORIES ── */}
+      {/* ════════════════════════════════
+          ARTIST STORIES
+          ════════════════════════════════ */}
       <section className="py-24 bg-[#060606] border-t border-white/5">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-4">Testimonials</p>
+          <div className="mb-14">
+            <p className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-3">Testimonials</p>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">What Artists Say About IICA</h2>
           </div>
 
@@ -253,7 +361,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── ARTIST SHOWCASE ── */}
+      {/* ════════════════════════════════
+          ARTIST SHOWCASE
+          ════════════════════════════════ */}
       <section className="py-24 bg-black border-t border-white/5 overflow-hidden">
         <div className="container mx-auto px-6 mb-12 flex justify-between items-end">
           <div>
@@ -267,7 +377,10 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="flex space-x-5 px-6 pb-6 overflow-x-auto snap-x snap-mandatory" style={{ scrollbarWidth: 'none' }}>
+        <div
+          className="flex space-x-5 px-6 pb-6 overflow-x-auto snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none' }}
+        >
           {ARTISTS.slice(0, 6).map((artist, i) => (
             <div key={artist.slug} className="snap-center shrink-0 w-[270px] md:w-[300px]">
               <ArtistCard artist={artist} delay={i * 0.08} />

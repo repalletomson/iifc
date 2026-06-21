@@ -42,3 +42,9 @@ id = "xaLE0fGb1xaz4GY92UAIp"
 uri = "file://artifacts/iica-website/public/images/events/event-1.png"
 type = "image"
 title = "Concert event banner"
+
+[[generated]]
+id = "bGjbbrElpqlLV0vWHepJ8"
+uri = "file://attached_assets/generated_images/indian_classical_music_concert_221b.png"
+type = "image"
+title = "generated_image"
