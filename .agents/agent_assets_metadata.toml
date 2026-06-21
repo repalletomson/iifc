@@ -1,0 +1,44 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "pfmKvo_I4TVDksf3BaOZ9"
+uri = "file://artifacts/iica-website/public/images/artists/debasmita.png"
+type = "image"
+title = "Female Sarod musician portrait"
+
+[[generated]]
+id = "7UIA-YB4QDhZ0AUld9ysU"
+uri = "file://artifacts/iica-website/public/images/artists/sandeep.png"
+type = "image"
+title = "Male Bansuri player portrait"
+
+[[generated]]
+id = "BtjcyipG8Y7iJnvQ7OWek"
+uri = "file://artifacts/iica-website/public/images/artists/anirban.png"
+type = "image"
+title = "Male vocalist portrait"
+
+[[generated]]
+id = "0IJKQt1nOJfVCyB0BeMyg"
+uri = "file://artifacts/iica-website/public/images/artists/shatavisha.png"
+type = "image"
+title = "Kathak dancer portrait"
+
+[[generated]]
+id = "zRerzFb8wGRSiZNPKsBBg"
+uri = "file://artifacts/iica-website/public/images/artists/sandipan.png"
+type = "image"
+title = "Male Tabla player portrait"
+
+[[generated]]
+id = "ft52WLwjTfA6YeoEMSfru"
+uri = "file://artifacts/iica-website/public/images/ceo.png"
+type = "image"
+title = "CEO portrait"
+
+[[generated]]
+id = "xaLE0fGb1xaz4GY92UAIp"
+uri = "file://artifacts/iica-website/public/images/events/event-1.png"
+type = "image"
+title = "Concert event banner"

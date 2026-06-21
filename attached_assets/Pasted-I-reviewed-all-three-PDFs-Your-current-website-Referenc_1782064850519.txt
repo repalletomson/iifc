@@ -1,0 +1,519 @@
+I reviewed all three PDFs:
+
+* Your current website: 
+* Reference website (EVEN Backstage): 
+* Detailed redesign requirements: 
+
+The biggest mistake would be telling Replit only what sections to add. Instead, you should give it a complete product/design brief so it can redesign the entire experience consistently.
+
+Copy and paste the prompt below into Replit:
+
+---
+
+# MASTER WEBSITE REDESIGN PROMPT
+
+You are an award-winning UI/UX designer and senior frontend engineer.
+
+Redesign the entire website for **International Indian Culture & Arts (IICA)** into a premium, modern, high-converting platform inspired by the visual quality, motion, layout structure, and premium feel of EVEN Backstage ([https://backstage.even.biz](https://backstage.even.biz)).
+
+DO NOT create a generic corporate website.
+
+The website should feel like:
+
+* Premium
+* Cinematic
+* Artist-centric
+* Luxury cultural brand
+* Modern startup
+* International platform
+* Built for musicians, artists, performers, educators, and creative professionals
+
+---
+
+# PRIMARY GOAL
+
+Transform IICA from a traditional informational website into a modern digital ecosystem for:
+
+* Artists
+* Musicians
+* Educators
+* Creative professionals
+* Event organizers
+* Industry leaders
+
+The website must immediately communicate:
+
+"India's most premium platform for performing arts, culture, artist branding, collaborations, events and legacy building."
+
+---
+
+# DESIGN STYLE
+
+Use:
+
+* Black background
+* Deep charcoal sections
+* White typography
+* Red CTA buttons
+* Premium gradients
+* Glassmorphism
+* Large typography
+* Smooth animations
+* Scroll-triggered motion
+* Modern cards
+* Hover effects
+* Rounded corners
+* Luxury spacing
+
+Reference:
+
+[https://backstage.even.biz](https://backstage.even.biz)
+
+Use the same premium visual language but create a unique identity for IICA.
+
+---
+
+# TECH STACK
+
+Use:
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+* Framer Motion
+* Shadcn UI
+* Responsive Design
+* Mobile First
+* SEO Optimized
+
+---
+
+# NAVIGATION
+
+Only 6 menu items:
+
+1. Home
+2. About Us
+3. Artists
+4. Jobs & Gigs
+5. Events
+6. CEO's Desk
+
+Sticky transparent navbar.
+
+Navbar becomes glassmorphism on scroll.
+
+---
+
+# HOME PAGE
+
+## HERO SECTION
+
+Replace current hero completely.
+
+Create a cinematic full-screen video hero.
+
+Video plays in background.
+
+Dark overlay.
+
+Large heading:
+
+"Empowering Artists Beyond Performance"
+
+Subheading:
+
+"International Indian Culture & Arts connects artists, educators, performers and creative leaders through branding, collaborations, opportunities and global recognition."
+
+Primary CTA:
+
+"Become a Member"
+
+Secondary CTA:
+
+"Explore Artists"
+
+Scrolling indicator at bottom.
+
+Large motion effects.
+
+Inspired by EVEN Backstage hero section.
+
+---
+
+# BECOME A MEMBER PAGE
+
+Create a completely separate premium landing page.
+
+URL:
+
+/membership
+
+When user clicks Become a Member button.
+
+Use all provided content.
+
+Create luxury storytelling layout.
+
+Sections:
+
+### SEO Powered Life Journey
+
+Large infographic section.
+
+Performance report image.
+
+Timeline design.
+
+### HD Promotion
+
+Embed Instagram reels.
+
+Create modern reel showcase.
+
+### Artist Branding
+
+Show benefits using premium cards.
+
+### Collaboration Ecosystem
+
+Create a circular network visualization.
+
+Place artist reels around the circle.
+
+Animated connecting lines.
+
+### Final CTA
+
+Membership form.
+
+Large red CTA.
+
+---
+
+# HOME PAGE SECTION 2
+
+Create only TWO premium feature cards.
+
+Layout inspired by EVEN Backstage feature blocks.
+
+Card 1:
+
+Increase Earnings by 80%
+
+On click:
+
+Open dedicated page.
+
+Copy content from:
+
+[https://iica.app/increase-your-artistic-brand-earnings/](https://iica.app/increase-your-artistic-brand-earnings/)
+
+Transform into premium visual storytelling.
+
+Add:
+
+* statistics
+* timelines
+* infographics
+* illustrations
+* premium callouts
+
+Card 2:
+
+Re-Launch Your Brand Offerings
+
+On click:
+
+Open dedicated page.
+
+Copy content from:
+
+[https://iica.app/prepare-to-succeed-as-performing-arts-professionals/](https://iica.app/prepare-to-succeed-as-performing-arts-professionals/)
+
+Transform into a modern premium landing page.
+
+---
+
+# SERVICES SECTION
+
+Use current IICA content.
+
+Create 3 premium cards:
+
+1. Premium Artist Branding
+2. Legacy Brand Loyalty Program
+3. International Outreach Solutions
+
+Add:
+
+* icons
+* hover animations
+* glowing borders
+
+Below cards:
+
+Blue CTA button:
+
+"Book a FREE Consultation"
+
+On click:
+
+Open appointment form modal.
+
+Fields:
+
+* Name
+* Email
+* Phone
+* Profession
+* Message
+
+---
+
+# ARTIST STORIES SECTION
+
+Inspired by EVEN's "Artists Are Talking"
+
+Dark premium layout.
+
+Large section heading:
+
+"What Artists Say About IICA"
+
+Embed YouTube videos.
+
+Each video inside premium card.
+
+Add testimonial text.
+
+Carousel slider.
+
+Auto-scroll.
+
+---
+
+# ARTISTS PAGE
+
+Reference:
+
+[https://www.even.biz/artists/all](https://www.even.biz/artists/all)
+
+Create:
+
+/artists
+
+Modern searchable artist directory.
+
+Features:
+
+* Search
+* Filters
+* Categories
+* Pagination
+* Grid Layout
+
+Each artist card contains:
+
+* Image
+* Name
+* Profession
+* Location
+* View Profile
+
+Hover animations.
+
+---
+
+# ARTIST PROFILE PAGE
+
+Most important page.
+
+Reference:
+
+[https://www.even.biz/artists/the-pocket-queen](https://www.even.biz/artists/the-pocket-queen)
+
+But expand significantly.
+
+URL:
+
+/artist/[slug]
+
+This page should support:
+
+* Full biography
+* Life journey
+* Awards
+* Videos
+* Instagram embeds
+* Gallery
+* Events
+* Achievements
+* Publications
+* Press mentions
+* Testimonials
+
+Admin should be able to update content easily.
+
+Layout:
+
+Hero Banner
+
+Biography
+
+Timeline
+
+Gallery
+
+Media
+
+Awards
+
+Contact
+
+---
+
+# EVENTS PAGE
+
+Reference:
+
+[https://www.district.in/events/](https://www.district.in/events/)
+
+Modern event marketplace.
+
+Features:
+
+* Upcoming events
+* Featured events
+* Event cards
+* Categories
+* Search
+* Calendar View
+
+Event card contains:
+
+* Banner
+* Date
+* Venue
+* Register Button
+
+---
+
+# JOBS & GIGS PAGE
+
+Create premium opportunity board.
+
+Features:
+
+* Artist jobs
+* Teaching opportunities
+* Event opportunities
+* Collaborations
+
+Search and filters.
+
+Apply button.
+
+---
+
+# CEO DESK PAGE
+
+Luxury editorial style.
+
+Large portrait.
+
+Message from CEO.
+
+Vision.
+
+Mission.
+
+Future roadmap.
+
+Timeline.
+
+Impact numbers.
+
+---
+
+# AWARDS SECTION
+
+Create a dedicated awards showcase.
+
+Elegant luxury design.
+
+For each awardee display:
+
+* 3 photos
+* Instagram Reel
+* Award Title
+* Achievement Story
+
+Use alternating layouts.
+
+Add subtle motion.
+
+---
+
+# FOOTER
+
+Keep all existing footer content.
+
+Modernize visuals only.
+
+Maintain:
+
+* Contact Information
+* Address
+* Email
+* Social Media
+* Terms & Conditions
+* Privacy Policy
+
+Use luxury black footer.
+
+---
+
+# ANIMATIONS
+
+Use Framer Motion.
+
+Add:
+
+* Fade Up
+* Reveal On Scroll
+* Parallax
+* Hover Effects
+* Image Zoom
+* Smooth Page Transitions
+
+Avoid excessive animations.
+
+Keep professional.
+
+---
+
+# PERFORMANCE
+
+Requirements:
+
+* Lighthouse Score 90+
+* Mobile Responsive
+* SEO Friendly
+* Lazy Loading
+* Optimized Images
+* Fast Loading
+
+---
+
+# FINAL INSTRUCTION
+
+Preserve all existing IICA content and artist data from the current website.
+
+Redesign the presentation completely.
+
+The final website should feel like a premium global platform for artists and culture, comparable in quality to modern startups such as EVEN, Spotify for Artists, Patreon, and MasterClass.
+
+---
+
+This version is much stronger than the PDF requirements alone because it tells Replit exactly how the site should look, feel, be structured, and be engineered. It will produce a significantly better result than a simple "copy this design" prompt.
