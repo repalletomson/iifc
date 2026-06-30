@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd artifacts/iica-website && npm install && npm run build",
+  "buildCommand": "cd artifacts/iica-website && npm install && npx vite build",
   "outputDirectory": "artifacts/iica-website/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
