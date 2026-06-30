@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { Link } from 'wouter';
-import { ARTISTS } from '@/data/artists';
+import { useConfig } from '@/lib/configContext';
+import { useTheme } from '@/lib/themeContext';
+
+const FILTERS = [
+  { label: 'All', tag: '' },
+  { label: 'Indian Classical', tag: '#indianclassical' },
+  { label: 'Western Classical', tag: '#western' },
+  { label: 'Percussion', tag: '#percussion' },
+  { label: 'Contemporary', tag: '#contemporary' },
+];
 
 const ARTIST_AVATARS = [
   "https://images.unsplash.com/photo-1619983081593-e2ba5b543168?w=400&q=80",
@@ -14,70 +23,134 @@ const ARTIST_AVATARS = [
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80",
   "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=400&q=80",
   "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80",
   "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80",
   "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&q=80",
 ];
 
 export default function Artists() {
   const [search, setSearch] = useState('');
+  const [activeFilter, setActiveFilter] = useState('');
+  const { theme } = useTheme();
+  const config = useConfig();
 
-  const filtered = ARTISTS.filter(a =>
-    a.name.toLowerCase().includes(search.toLowerCase()) ||
-    a.profession.toLowerCase().includes(search.toLowerCase())
-  );
+  // Only use Google Sheets data — no hardcoded fallback
+  const allArtists = useMemo(() => {
+    if (config.artists.length === 0) return [];
+    return config.artists.map(a => ({
+      slug: a.slug,
+      name: a.name,
+      profession: a.profession,
+      image: a.image,
+      tags: a.tags ? a.tags.toLowerCase() : '',
+    }));
+  }, [config.artists]);
+
+  const filtered = useMemo(() => {
+    let result = allArtists;
+
+    // Text search filter
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(a =>
+        a.name.toLowerCase().includes(q) ||
+        a.profession.toLowerCase().includes(q)
+      );
+    }
+
+    // Tag filter
+    if (activeFilter) {
+      result = result.filter(a => a.tags.includes(activeFilter));
+    }
+
+    return result;
+  }, [allArtists, search, activeFilter]);
 
   return (
-    <div className="bg-black text-white min-h-screen pt-16">
+    <div className="bg-background text-foreground min-h-screen pt-20">
 
-      {/* ── Header bar ── */}
-      <div className="sticky top-16 z-20 bg-black border-b border-white/8">
-        <div className="container mx-auto px-6 py-4 flex items-center gap-6">
-          <h1 className="font-serif text-2xl font-bold text-white shrink-0">Artists</h1>
+      {/* ── Header ── */}
+      <div className="container mx-auto px-6 pt-12 pb-8">
+        {/* Search bar — above title */}
+        <div className="relative max-w-md mb-6">
+          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`} />
+          <input
+            type="text"
+            placeholder="Search for releases or artists"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className={`w-full rounded-full pl-12 pr-5 py-3 text-sm transition-colors focus:outline-none ${
+              theme === 'light'
+                ? 'bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:border-accent'
+                : 'bg-[#1a1a1a] border border-white/10 text-white placeholder:text-gray-500 focus:border-white/25'
+            }`}
+          />
+        </div>
 
-          {/* Search — EVEN style */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search releases or artists"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-white/10 rounded-full pl-10 pr-4 py-2 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-white/25 transition-colors"
-            />
-          </div>
+        <h1 className={`font-sans font-black ${theme === 'light' ? 'text-foreground' : 'text-white'}`} style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}>
+          Artists
+        </h1>
+
+        {/* ── Filter chips ── */}
+        <div className="flex flex-wrap gap-2 mt-6">
+          {FILTERS.map((f) => {
+            const isActive = activeFilter === f.tag;
+            return (
+              <button
+                key={f.tag}
+                onClick={() => setActiveFilter(f.tag)}
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                  isActive
+                    ? 'bg-[#C13584] text-white border-[#C13584] shadow-sm'
+                    : theme === 'light'
+                      ? 'bg-card text-muted-foreground border-border hover:border-accent hover:text-foreground'
+                      : 'bg-[#1a1a1a] text-gray-400 border-white/10 hover:border-white/25 hover:text-white'
+                }`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* ── Artist grid — EVEN style large circles ── */}
-      <div className="container mx-auto px-6 py-10">
+      {/* ── Artist grid — EVEN style ── */}
+      <div className="container mx-auto px-6 pb-20">
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-gray-600">
-            <p className="text-lg">No artists found for "{search}"</p>
+          <div className={`text-center py-20 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>
+            <p className="text-lg">
+              {search || activeFilter
+                ? `No artists found${search ? ` for "${search}"` : ''}${activeFilter ? ` in "${FILTERS.find(f => f.tag === activeFilter)?.label}"` : ''}`
+                : 'No artists available yet. Check back soon!'}
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-x-6 gap-y-10">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-x-5 gap-y-8">
             {filtered.map((artist, i) => (
               <motion.div
                 key={artist.slug}
-                initial={{ opacity: 0, scale: 0.88 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.03 }}
-                className="flex flex-col items-center gap-3 group"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.02 }}
+                className="flex flex-col items-center gap-2.5 group cursor-pointer"
               >
                 <Link href={`/artist/${artist.slug}`}>
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#1a1a1a] border-2 border-transparent group-hover:border-[#C13584]/50 transition-all duration-300 cursor-pointer">
+                  <div className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full overflow-hidden transition-all duration-200 ${
+                    theme === 'light'
+                      ? 'bg-muted group-hover:ring-2 group-hover:ring-accent/30'
+                      : 'bg-[#1a1a1a] group-hover:ring-2 group-hover:ring-white/20'
+                  }`}>
                     <img
-                      src={ARTIST_AVATARS[i % ARTIST_AVATARS.length]}
+                      src={artist.image || ARTIST_AVATARS[i % ARTIST_AVATARS.length]}
                       alt={artist.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = ARTIST_AVATARS[i % ARTIST_AVATARS.length];
+                      }}
                     />
                   </div>
                 </Link>
-                <div className="text-center">
-                  <p className="text-white text-xs font-semibold leading-tight group-hover:text-[#C13584] transition-colors">{artist.name}</p>
-                  <p className="text-gray-600 text-[10px] mt-0.5 line-clamp-1">{(artist.instrument || artist.profession.split('|')[0]).trim()}</p>
-                </div>
+                <p className={`text-xs font-medium text-center leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{artist.name}</p>
               </motion.div>
             ))}
           </div>

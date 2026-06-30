@@ -1,19 +1,46 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useTheme } from '@/lib/themeContext';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [location] = useLocation();
+  const { theme } = useTheme();
+
+  const toggleVideoMute = () => {
+    const video = document.querySelector('video');
+    if (video) {
+      video.muted = !video.muted;
+      setIsVideoMuted(!isVideoMuted);
+    }
+  };
 
   useEffect(() => {
+    let lastScrollY = 0;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 50);
+
+      // Hide on scroll down, show on scroll up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      lastScrollY = currentScrollY;
     };
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -28,20 +55,27 @@ export function Navbar() {
 
   return (
     <>
-      <nav
+      <motion.nav
+        animate={{ y: isVisible ? 0 : -100 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'backdrop-blur-md bg-black/70 border-b border-white/10'
+            ? theme === 'light'
+              ? 'backdrop-blur-md bg-background/90 border-b border-border shadow-sm'
+              : 'backdrop-blur-md bg-background/70 border-b border-white/10'
             : 'bg-transparent'
         }`}
       >
-        {isScrolled && (
+        {isScrolled && theme === 'dark' && (
           <div className="absolute bottom-0 left-0 right-0 h-[1px] gradient-bg" />
         )}
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/">
-            <span className="font-serif text-3xl font-bold gradient-text cursor-pointer tracking-wider">
+            <span className="font-serif text-3xl font-bold gradient-text cursor-pointer tracking-wider leading-none">
               IICA
+            </span>
+            <span className="hidden md:block text-[9px] text-gray-500 tracking-[0.25em] uppercase mt-0.5">
+              Advancing Arts & Culture for Humanity
             </span>
           </Link>
 
@@ -50,8 +84,14 @@ export function Navbar() {
             {navLinks.map((link) => (
               <Link key={link.path} href={link.path}>
                 <span
-                  className={`text-sm tracking-wide hover:text-white transition-colors cursor-pointer ${
-                    location === link.path ? 'text-white font-medium' : 'text-gray-400'
+                  className={`text-sm tracking-wide transition-colors cursor-pointer ${
+                    location === link.path 
+                      ? theme === 'light'
+                        ? 'text-foreground font-medium'
+                        : 'text-white font-medium'
+                      : theme === 'light'
+                        ? 'text-muted-foreground hover:text-foreground'
+                        : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -60,7 +100,21 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
+            {location === '/' && (
+              <button
+                onClick={toggleVideoMute}
+                className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${
+                  theme === 'light'
+                    ? 'bg-muted/50 text-foreground hover:bg-muted border border-border/50'
+                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/15'
+                }`}
+                aria-label={isVideoMuted ? 'Unmute video' : 'Mute video'}
+              >
+                {isVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
+            )}
             <Link href="/membership">
               <Button className="gradient-bg text-white border-0 hover:opacity-90 transition-opacity">
                 Become a Member
@@ -70,13 +124,13 @@ export function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden text-white"
+            className={theme === 'light' ? 'md:hidden text-foreground' : 'md:hidden text-white'}
             onClick={() => setIsMobileMenuOpen(true)}
           >
             <Menu className="h-6 w-6" />
           </button>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Mobile Menu Drawer */}
       <AnimatePresence>
@@ -85,11 +139,15 @@ export function Navbar() {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 20 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col pt-24 px-8"
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className={`fixed inset-0 z-50 flex flex-col pt-24 px-8 ${
+              theme === 'light'
+                ? 'bg-background/95 backdrop-blur-xl'
+                : 'bg-background/95 backdrop-blur-xl'
+            }`}
           >
             <button
-              className="absolute top-6 right-6 text-white"
+              className={theme === 'light' ? 'absolute top-6 right-6 text-foreground' : 'absolute top-6 right-6 text-white'}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <X className="h-8 w-8" />
@@ -100,14 +158,19 @@ export function Navbar() {
                   <span
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`font-serif text-3xl cursor-pointer ${
-                      location === link.path ? 'gradient-text' : 'text-gray-400 hover:text-white'
+                      location === link.path 
+                        ? 'gradient-text' 
+                        : theme === 'light'
+                          ? 'text-muted-foreground hover:text-foreground'
+                          : 'text-gray-400 hover:text-white'
                     }`}
                   >
                     {link.label}
                   </span>
                 </Link>
               ))}
-              <div className="pt-8">
+              <div className="pt-8 space-y-4">
+                <ThemeToggle />
                 <Link href="/membership">
                   <Button 
                     className="w-full gradient-bg text-white h-14 text-lg"

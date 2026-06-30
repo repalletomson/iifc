@@ -14,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from '@/lib/themeContext';
+import { extractInstagramCode } from '@/lib/googleSheets';
 
 const membershipFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -25,6 +27,7 @@ const membershipFormSchema = z.object({
 
 export default function Membership() {
   const { toast } = useToast();
+  const { theme } = useTheme();
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   const form = useForm<z.infer<typeof membershipFormSchema>>({
@@ -40,21 +43,28 @@ export default function Membership() {
 
   function onSubmit(values: z.infer<typeof membershipFormSchema>) {
     console.log(values);
+    const msg = `*IICA Membership Application*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Art Form:* ${encodeURIComponent(values.artForm)}`;
+    window.open(`https://wa.me/919542758814?text=${msg}`, '_blank', 'noopener,noreferrer');
+    toast({
+      title: "Application Submitted",
+      description: "You are being redirected to WhatsApp. We will get back to you shortly!",
+    });
     setIsSubmitted(true);
+    form.reset();
   }
 
   return (
-    <div className="bg-black text-white min-h-screen pt-20">
+    <div className="bg-background text-foreground min-h-screen pt-20">
       {/* Hero */}
       <section className="relative py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#833AB4]/20 via-[#C13584]/10 to-black pointer-events-none" />
+          <div className={`absolute inset-0 bg-gradient-to-b pointer-events-none ${theme === 'light' ? 'from-[#833AB4]/10 via-[#C13584]/5 to-background' : 'from-[#833AB4]/20 via-[#C13584]/10 to-black'}`} />
         </div>
         <div className="container relative z-10 mx-auto px-6 text-center max-w-4xl">
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight"
+            className={`font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}
           >
             Exclusive Membership <br/>
             <span className="gradient-text">with IICA</span>
@@ -63,7 +73,7 @@ export default function Membership() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-300"
+            className={`text-xl ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}
           >
             Elevating your brand value beyond a lifetime. Join a curated network of India's finest classical and traditional artists.
           </motion.p>
@@ -71,7 +81,7 @@ export default function Membership() {
       </section>
 
       {/* Section A - SEO Life Journey */}
-      <section className="py-24 bg-[#0a0a0a]">
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-muted' : 'bg-[#0a0a0a]'}`}>
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div 
@@ -79,8 +89,8 @@ export default function Membership() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="font-serif text-4xl font-bold mb-6">SEO-Powered Life Journey</h2>
-              <p className="text-gray-400 text-lg leading-relaxed mb-8">
+              <h2 className={`font-serif text-4xl font-bold mb-6 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>SEO-Powered Life Journey</h2>
+              <p className={`text-lg leading-relaxed mb-8 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
                 When authentic life journeys of artists are published on a secure web platform powered with latest technologies which enable visibility and enhance branding mileage of an artistic brand, it is possible to get authentic data-based proof of an artist's demand, in India & abroad.
               </p>
               <ul className="space-y-4">
@@ -90,7 +100,7 @@ export default function Membership() {
                   "Verified Authentic Data",
                   "Global Visibility Metrics"
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center text-gray-300">
+                  <li key={i} className={`flex items-center ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>
                     <div className="w-2 h-2 rounded-full gradient-bg mr-4" />
                     {item}
                   </li>
@@ -102,11 +112,11 @@ export default function Membership() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="glass-card p-6 rounded-2xl border border-white/10 relative overflow-hidden"
+              className={`glass-card p-6 rounded-2xl border relative overflow-hidden ${theme === 'light' ? 'border-border' : 'border-white/10'}`}
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#C13584] rounded-full filter blur-[64px] opacity-20" />
-              <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
-                <h4 className="font-medium text-white">Brand Analytics</h4>
+              <div className={`flex items-center justify-between mb-8 pb-4 ${theme === 'light' ? 'border-b border-border' : 'border-b border-white/10'}`}>
+                <h4 className={`font-medium ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Brand Analytics</h4>
                 <span className="text-xs text-green-400">+24.5% Global Reach</span>
               </div>
               {/* Fake chart */}
@@ -121,33 +131,38 @@ export default function Membership() {
       </section>
 
       {/* Section B - HD Promotion */}
-      <section className="py-24 bg-black">
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`}>
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl font-bold mb-4">HD-Quality Promotion of Your Craft</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Showcase your artistry with premium production values that command respect on the global stage.</p>
+            <h2 className={`font-serif text-4xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>HD-Quality Promotion of Your Craft</h2>
+            <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Showcase your artistry with premium production values that command respect on the global stage.</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {["Sandipan Parial", "Neecia Majolly", "Abhishek Chouhan", "Shatavisha Mukherjee"].map((name, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: "Sandipan Parial", code: "DSKrHNPCa33", type: "reel" },
+              { name: "Neecia Majolly", code: "DSHnkrAiZRI", type: "p" },
+              { name: "Abhishek Chouhan", code: "DYANQQ9OZ5k", type: "reel" },
+              { name: "Shatavisha Mukherjee", code: "DRl6iF2ibNS", type: "reel" },
+            ].map((item, i) => (
               <motion.div 
-                key={name}
+                key={item.name}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="glass-card rounded-2xl overflow-hidden"
+                className={`rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
               >
-                <div className="aspect-[9/16] bg-[#111] relative p-4 flex flex-col justify-between">
-                  <div className="flex items-center justify-between z-10">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full gradient-bg flex items-center justify-center text-xs font-bold mr-2">{name.charAt(0)}</div>
-                      <span className="text-sm font-medium">{name}</span>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-gray-600 text-sm">Reel Coming Soon</span>
-                  </div>
+                <iframe
+                  src={`https://www.instagram.com/${item.type}/${item.code}/embed/`}
+                  className="w-full aspect-[9/16]"
+                  frameBorder="0"
+                  scrolling="no"
+                  allowTransparency={true}
+                  loading="lazy"
+                />
+                <div className="p-3">
+                  <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
                 </div>
               </motion.div>
             ))}
@@ -156,63 +171,48 @@ export default function Membership() {
       </section>
 
       {/* Section C - Collaboration */}
-      <section className="py-24 bg-[#0a0a0a] overflow-hidden">
+      <section className={`py-24 overflow-hidden transition-colors ${theme === 'light' ? 'bg-muted' : 'bg-[#0a0a0a]'}`}>
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl font-bold mb-4">Collaboration with Like-Minded Artists</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Connect, create, and elevate with peers who share your commitment to excellence.</p>
+            <h2 className={`font-serif text-4xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Collaboration with Like-Minded Artists</h2>
+            <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Connect, create, and elevate with peers who share your commitment to excellence.</p>
           </div>
 
-          <div className="relative w-full max-w-lg mx-auto aspect-square flex items-center justify-center">
-            {/* Connecting lines */}
-            <svg className="absolute inset-0 w-full h-full text-white/20" viewBox="0 0 100 100">
-              <motion.polygon 
-                points="50,15 85,75 15,75" 
-                fill="none" 
-                stroke="url(#grad1)" 
-                strokeWidth="0.5"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                transition={{ duration: 2, ease: "easeInOut" }}
-              />
-              <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#833AB4" />
-                  <stop offset="50%" stopColor="#C13584" />
-                  <stop offset="100%" stopColor="#E1306C" />
-                </linearGradient>
-              </defs>
-            </svg>
-
-            {/* Nodes */}
-            <div className="absolute top-[10%] left-1/2 -translate-x-1/2 text-center">
-              <div className="w-20 h-20 rounded-full gradient-bg mb-2 mx-auto flex items-center justify-center border-4 border-black">
-                <span className="text-xl font-bold">DB</span>
-              </div>
-              <span className="text-sm font-medium">Debasmita Bhattacharya</span>
-            </div>
-
-            <div className="absolute bottom-[20%] right-[10%] text-center">
-              <div className="w-20 h-20 rounded-full gradient-bg mb-2 mx-auto flex items-center justify-center border-4 border-black">
-                <span className="text-xl font-bold">SV</span>
-              </div>
-              <span className="text-sm font-medium">Sandeep Vasishta</span>
-            </div>
-
-            <div className="absolute bottom-[20%] left-[10%] text-center">
-              <div className="w-20 h-20 rounded-full gradient-bg mb-2 mx-auto flex items-center justify-center border-4 border-black">
-                <span className="text-xl font-bold">AB</span>
-              </div>
-              <span className="text-sm font-medium">Anirban Bhattacharyya</span>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            {[
+              { name: "Debasmita Bhattacharya", code: "DO3c-GgjGyM" },
+              { name: "Sandeep Vasishta", code: "CdV4q2BPDKR" },
+              { name: "Anirban Bhattacharyya", code: "DXLcnKKDFrX" },
+            ].map((item, i) => (
+              <motion.div 
+                key={item.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className={`rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+              >
+                <iframe
+                  src={`https://www.instagram.com/reel/${extractInstagramCode(item.code)}/embed/`}
+                  className="w-full aspect-[9/16]"
+                  frameBorder="0"
+                  scrolling="no"
+                  allowTransparency={true}
+                  loading="lazy"
+                />
+                <div className="p-3">
+                  <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Form Section */}
-      <section className="py-24 bg-black" id="apply">
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`} id="apply">
         <div className="container mx-auto px-6 max-w-2xl">
-          <div className="glass-card p-10 rounded-2xl gradient-border">
+          <div className={`glass-card p-10 rounded-2xl gradient-border ${theme === 'light' ? 'bg-card' : ''}`}>
             {isSubmitted ? (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -224,12 +224,12 @@ export default function Membership() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="font-serif text-3xl font-bold mb-4">Application Received</h3>
-                <p className="text-gray-400">Our curation committee will review your profile and contact you within 48 hours.</p>
+                <h3 className={`font-serif text-3xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Application Received</h3>
+                <p className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}>Our curation committee will review your profile and contact you within 48 hours.</p>
               </motion.div>
             ) : (
               <>
-                <h2 className="font-serif text-3xl font-bold mb-8 text-center">Apply for Membership</h2>
+                <h2 className={`font-serif text-3xl font-bold mb-8 text-center ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Apply for Membership</h2>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
@@ -237,9 +237,9 @@ export default function Membership() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300">Full Name</FormLabel>
+                          <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Full Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter your full name" className="bg-[#111] border-white/10 h-12" {...field} />
+                            <Input placeholder="Enter your full name" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -252,9 +252,9 @@ export default function Membership() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Email Address</FormLabel>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Email Address</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="you@example.com" className="bg-[#111] border-white/10 h-12" {...field} />
+                              <Input type="email" placeholder="you@example.com" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -265,9 +265,9 @@ export default function Membership() {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Phone Number</FormLabel>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Phone Number</FormLabel>
                             <FormControl>
-                              <Input placeholder="+91 98765 43210" className="bg-[#111] border-white/10 h-12" {...field} />
+                              <Input placeholder="+91 98765 43210" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -281,9 +281,9 @@ export default function Membership() {
                         name="profession"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Profession</FormLabel>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Profession</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. Musician, Dancer" className="bg-[#111] border-white/10 h-12" {...field} />
+                              <Input placeholder="e.g. Musician, Dancer" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -294,9 +294,9 @@ export default function Membership() {
                         name="artForm"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Specific Art Form</FormLabel>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Specific Art Form</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. Sitar, Kathak" className="bg-[#111] border-white/10 h-12" {...field} />
+                              <Input placeholder="e.g. Sitar, Kathak" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/lib/themeContext";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -38,6 +39,7 @@ interface ConsultationModalProps {
 export function ConsultationModal({ children }: ConsultationModalProps) {
   const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
+  const { theme } = useTheme();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,9 +54,11 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    const msg = `*Free Consultation Request*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Message:* ${encodeURIComponent(values.message)}`;
+    window.open(`https://wa.me/919542758814?text=${msg}`, '_blank', 'noopener,noreferrer');
     toast({
       title: "Request Submitted",
-      description: "We will get back to you shortly to schedule your consultation.",
+      description: "You are being redirected to WhatsApp. We will get back to you shortly!",
     });
     setOpen(false);
     form.reset();
@@ -65,10 +69,16 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] bg-[#0a0a0a] border border-white/10 text-white">
+      <DialogContent className={`sm:max-w-[500px] border transition-colors ${
+        theme === 'light'
+          ? 'bg-white border-border text-foreground'
+          : 'bg-[#0a0a0a] border-white/10 text-white'
+      }`}>
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">Book a Free Consultation</DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogTitle className={`font-serif text-2xl ${
+            theme === 'light' ? 'text-foreground' : 'text-white'
+          }`}>Book a Free Consultation</DialogTitle>
+          <DialogDescription className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}>
             Fill out the form below and our legacy advisors will contact you to discuss your brand.
           </DialogDescription>
         </DialogHeader>
@@ -82,7 +92,11 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Pt. Ravi Shankar" className="bg-black/50 border-white/10" {...field} />
+                      <Input 
+                        placeholder="Pt. Ravi Shankar" 
+                        className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -96,7 +110,12 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="artist@example.com" type="email" className="bg-black/50 border-white/10" {...field} />
+                        <Input 
+                          placeholder="artist@example.com" 
+                          type="email" 
+                          className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -109,7 +128,11 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                     <FormItem>
                       <FormLabel>Phone</FormLabel>
                       <FormControl>
-                        <Input placeholder="+91 98765 43210" className="bg-black/50 border-white/10" {...field} />
+                        <Input 
+                          placeholder="+91 98765 43210" 
+                          className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -123,7 +146,11 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                   <FormItem>
                     <FormLabel>Profession / Art Form</FormLabel>
                     <FormControl>
-                      <Input placeholder="Sitar Player, Kathak Dancer, etc." className="bg-black/50 border-white/10" {...field} />
+                      <Input 
+                        placeholder="Sitar Player, Kathak Dancer, etc." 
+                        className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -138,7 +165,9 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                     <FormControl>
                       <Textarea 
                         placeholder="Tell us about your current branding goals..." 
-                        className="bg-black/50 border-white/10 resize-none h-24" 
+                        className={`resize-none h-24 ${
+                          theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'
+                        }`}
                         {...field} 
                       />
                     </FormControl>

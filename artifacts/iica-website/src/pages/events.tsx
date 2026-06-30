@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, ChevronLeft, ChevronRight, ArrowRight, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTheme } from '@/lib/themeContext';
 
 /* ─── FEATURED EVENTS (hero carousel) ─── */
 const FEATURED = [
@@ -56,6 +57,7 @@ const ALL_EVENTS = [
 const CATEGORIES = ["All", "Concert", "Festival", "Workshop", "Awards", "Performance", "Summit"];
 
 export default function Events() {
+  const { theme } = useTheme();
   const [featIdx, setFeatIdx] = useState(0);
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -72,7 +74,7 @@ export default function Events() {
   const feat = FEATURED[featIdx];
 
   return (
-    <div className="bg-black text-white min-h-screen pt-16">
+    <div className="bg-background text-foreground min-h-screen pt-16 transition-colors duration-300">
 
       {/* ══════════════════════════════════════
           FEATURED CAROUSEL — District.in style
@@ -89,9 +91,9 @@ export default function Events() {
             className="absolute inset-0"
           >
             <img src={feat.bg} alt={feat.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/60" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
+            <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-black/60'}`} />
+            <div className={`absolute inset-0 bg-gradient-to-t ${theme === 'light' ? 'from-white via-white/20 to-transparent' : 'from-black via-black/20 to-transparent'}`} />
+            <div className={`absolute inset-0 bg-gradient-to-r ${theme === 'light' ? 'from-white/80 via-transparent to-transparent' : 'from-black/80 via-transparent to-transparent'}`} />
           </motion.div>
         </AnimatePresence>
 
@@ -113,9 +115,9 @@ export default function Events() {
                 >
                   {feat.category}
                 </span>
-                <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">{feat.title}</h1>
-                <p className="text-gray-300 text-sm mb-4">{feat.subtitle}</p>
-                <div className="flex flex-wrap gap-4 text-gray-400 text-xs mb-6">
+                <h1 className={`font-serif text-3xl md:text-4xl font-bold mb-2 leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{feat.title}</h1>
+                <p className={`text-sm mb-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>{feat.subtitle}</p>
+                <div className={`flex flex-wrap gap-4 text-xs mb-6 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
                   <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#C13584]" />{feat.date}</span>
                   <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />{feat.venue}</span>
                 </div>
@@ -130,13 +132,21 @@ export default function Events() {
         {/* Prev / Next arrows */}
         <button
           onClick={() => setFeatIdx(i => (i - 1 + FEATURED.length) % FEATURED.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 border border-white/20 flex items-center justify-center hover:bg-black/70 transition-all"
+          className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+            theme === 'light'
+              ? 'bg-card/70 border-border hover:bg-card'
+              : 'bg-black/40 border-white/20 hover:bg-black/70'
+          }`}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
         <button
           onClick={() => setFeatIdx(i => (i + 1) % FEATURED.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 border border-white/20 flex items-center justify-center hover:bg-black/70 transition-all"
+          className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+            theme === 'light'
+              ? 'bg-card/70 border-border hover:bg-card'
+              : 'bg-black/40 border-white/20 hover:bg-black/70'
+          }`}
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -147,7 +157,7 @@ export default function Events() {
             <button
               key={i}
               onClick={() => setFeatIdx(i)}
-              className={`h-1 rounded-full transition-all ${i === featIdx ? 'w-6 bg-white' : 'w-2 bg-white/30'}`}
+              className={`h-1 rounded-full transition-all ${i === featIdx ? 'w-6 bg-[#C13584]' : theme === 'light' ? 'w-2 bg-border' : 'w-2 bg-white/30'}`}
             />
           ))}
         </div>
@@ -156,7 +166,7 @@ export default function Events() {
       {/* ══════════════════════════════════════
           CATEGORY PILLS
           ══════════════════════════════════════ */}
-      <section className="bg-[#080808] border-b border-white/8 sticky top-16 z-30">
+      <section className={`border-b sticky top-16 z-30 ${theme === 'light' ? 'bg-muted border-border' : 'bg-[#080808] border-white/8'}`}>
         <div className="container mx-auto px-6">
           <div className="flex gap-2 overflow-x-auto py-4" style={{ scrollbarWidth: 'none' }}>
             {CATEGORIES.map(cat => (
@@ -166,7 +176,9 @@ export default function Events() {
                 className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                   activeCategory === cat
                     ? 'gradient-bg text-white border-transparent'
-                    : 'border-white/15 text-gray-400 hover:text-white hover:border-white/30 bg-transparent'
+                    : theme === 'light'
+                      ? 'border-border text-muted-foreground hover:text-foreground hover:border-accent/50 bg-transparent'
+                      : 'border-white/15 text-gray-400 hover:text-white hover:border-white/30 bg-transparent'
                 }`}
               >
                 {cat}
@@ -183,9 +195,9 @@ export default function Events() {
         <div className="container mx-auto px-6">
 
           <div className="flex items-center justify-between mb-8">
-            <h2 className="font-serif text-2xl font-bold text-white">
+            <h2 className={`font-serif text-2xl font-bold ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>
               {activeCategory === "All" ? "All Events" : activeCategory}
-              <span className="text-gray-600 text-base font-normal ml-2">({filtered.length})</span>
+              <span className={`text-base font-normal ml-2 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>({filtered.length})</span>
             </h2>
           </div>
 
@@ -202,7 +214,11 @@ export default function Events() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: i * 0.04 }}
-                  className="group cursor-pointer rounded-2xl overflow-hidden bg-[#0d0d0d] border border-white/8 hover:border-white/20 transition-all duration-300"
+                  className={`group cursor-pointer rounded-2xl overflow-hidden border transition-all duration-300 ${
+                    theme === 'light'
+                      ? 'bg-card border-border hover:border-accent/30 hover:shadow-md'
+                      : 'bg-[#0d0d0d] border-white/8 hover:border-white/20'
+                  }`}
                 >
                   {/* Poster image */}
                   <div className="aspect-[3/4] relative overflow-hidden">
@@ -212,7 +228,7 @@ export default function Events() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${theme === 'light' ? 'from-white via-white/30 to-transparent' : 'from-black via-black/30 to-transparent'}`} />
 
                     {/* Category pill */}
                     <div
@@ -231,11 +247,11 @@ export default function Events() {
 
                     {/* Bottom info */}
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <p className="text-white font-bold text-sm leading-snug line-clamp-2 mb-1">{event.title}</p>
-                      <p className="text-gray-400 text-[11px] flex items-center gap-1">
+                      <p className={`font-bold text-sm leading-snug line-clamp-2 mb-1 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{event.title}</p>
+                      <p className={`text-[11px] flex items-center gap-1 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
                         <Calendar className="w-3 h-3 text-[#C13584] shrink-0" />{event.date}
                       </p>
-                      <p className="text-gray-500 text-[11px] flex items-center gap-1 mt-0.5">
+                      <p className={`text-[11px] flex items-center gap-1 mt-0.5 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
                         <MapPin className="w-3 h-3 text-[#833AB4] shrink-0" />{event.venue}
                       </p>
                     </div>
@@ -246,7 +262,7 @@ export default function Events() {
           </motion.div>
 
           {filtered.length === 0 && (
-            <div className="text-center py-20 text-gray-600">
+            <div className={`text-center py-20 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>
               <p className="text-lg">No events in this category yet.</p>
             </div>
           )}

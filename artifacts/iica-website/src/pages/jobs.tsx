@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import { Briefcase, MapPin, Clock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTheme } from '@/lib/themeContext';
 
 export default function Jobs() {
+  const { theme } = useTheme();
   const jobs = [
     { id: 1, title: "Senior Faculty - Kathak", type: "Teaching", location: "Mumbai / Hybrid", deadline: "Oct 30, 2025" },
     { id: 2, title: "Sitar Accompanist for European Tour", type: "Performance", location: "Europe (Tour)", deadline: "Nov 15, 2025" },
@@ -17,7 +19,7 @@ export default function Jobs() {
   ];
 
   return (
-    <div className="bg-black text-white min-h-screen pt-20">
+    <div className="bg-background text-foreground min-h-screen pt-20 transition-colors duration-300">
       <div className="container mx-auto px-6 py-12">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -25,14 +27,14 @@ export default function Jobs() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <h1 className="font-serif text-5xl md:text-6xl font-bold mb-6">Jobs & Gigs</h1>
-          <p className="text-gray-400 text-lg">Premium opportunities for performers, educators, and arts management professionals across the globe.</p>
+          <p className={`text-lg ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Premium opportunities for performers, educators, and arts management professionals across the globe.</p>
         </motion.div>
 
         <div className="mb-12 flex flex-col md:flex-row gap-6 justify-between items-center">
           <div className="w-full md:w-1/2">
             <Input 
               placeholder="Search roles, skills, or locations..." 
-              className="bg-[#111] border-white/10 h-14 rounded-xl px-6 text-white"
+              className={`h-14 rounded-xl px-6 ${theme === 'light' ? 'bg-background border-input text-foreground' : 'bg-[#111] border-white/10 text-white'}`}
             />
           </div>
           <div className="flex flex-wrap gap-3 w-full md:w-auto">
@@ -40,7 +42,7 @@ export default function Jobs() {
               <button 
                 key={filter}
                 className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  i === 0 ? 'gradient-bg text-white' : 'bg-[#111] border border-white/10 text-gray-400 hover:text-white hover:bg-[#222]'
+                  i === 0 ? 'gradient-bg text-white' : theme === 'light' ? 'bg-muted border border-border text-foreground hover:bg-accent hover:text-white' : 'bg-[#111] border border-white/10 text-gray-400 hover:text-white hover:bg-[#222]'
                 }`}
               >
                 {filter}
@@ -57,7 +59,11 @@ export default function Jobs() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.01 }}
-              className="glass-card p-8 rounded-2xl border border-white/5 hover:border-[#833AB4]/50 transition-colors group flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"
+              className={`p-8 rounded-2xl transition-all group flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 ${
+                theme === 'light'
+                  ? 'bg-card border border-border shadow-sm hover:shadow-md hover:border-accent/50'
+                  : 'glass-card border border-white/5 hover:border-[#833AB4]/50'
+              }`}
             >
               <div>
                 <div className="flex items-center mb-3">
@@ -65,8 +71,8 @@ export default function Jobs() {
                     {job.type}
                   </span>
                 </div>
-                <h3 className="font-serif text-2xl font-bold mb-4">{job.title}</h3>
-                <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                <h3 className={`font-serif text-2xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{job.title}</h3>
+                <div className={`flex flex-wrap gap-4 text-sm ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
                   <div className="flex items-center"><MapPin className="w-4 h-4 mr-1.5" /> {job.location}</div>
                   <div className="flex items-center"><Clock className="w-4 h-4 mr-1.5" /> Apply by: {job.deadline}</div>
                 </div>
