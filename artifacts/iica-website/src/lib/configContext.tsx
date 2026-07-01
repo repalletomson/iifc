@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { Testimonial, TalkShowVideo, InstagramReel, AwardRecipient, SheetArtist } from '@/lib/googleSheets';
+import type { Testimonial, TalkShowVideo, InstagramReel, AwardRecipient, SheetArtist, Job } from '@/lib/googleSheets';
 import {
   fetchTestimonials, fetchTalkShow, fetchInstagramAwards,
   fetchInstagramPromo, fetchInstagramCollab, fetchAwards,
-  fetchArtists, fetchHeroCards,
+  fetchArtists, fetchHeroCards, fetchJobs,
 } from '@/lib/googleSheets';
 
 interface ConfigData {
@@ -15,6 +15,7 @@ interface ConfigData {
   awards: AwardRecipient[];
   artists: SheetArtist[];
   heroCards: any[];
+  jobs: Job[];
   loading: boolean;
   refresh: () => void;
 }
@@ -22,24 +23,24 @@ interface ConfigData {
 const ConfigContext = createContext<ConfigData>({
   testimonials: [], talkShow: [], instagramAwards: [],
   instagramPromo: [], instagramCollab: [], awards: [],
-  artists: [], heroCards: [], loading: true, refresh: () => {},
+  artists: [], heroCards: [], jobs: [], loading: true, refresh: () => {},
 });
 
 export function ConfigProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<Omit<ConfigData, 'refresh'>>({
     testimonials: [], talkShow: [], instagramAwards: [],
     instagramPromo: [], instagramCollab: [], awards: [],
-    artists: [], heroCards: [], loading: true,
+    artists: [], heroCards: [], jobs: [], loading: true,
   });
 
   const load = async () => {
     setData(prev => ({ ...prev, loading: true }));
     try {
-      const [testimonials, talkShow, instagramAwards, instagramPromo, instagramCollab, awards, artists, heroCards] =
+      const [testimonials, talkShow, instagramAwards, instagramPromo, instagramCollab, awards, artists, heroCards, jobs] =
         await Promise.all([
           fetchTestimonials(), fetchTalkShow(), fetchInstagramAwards(),
           fetchInstagramPromo(), fetchInstagramCollab(), fetchAwards(),
-          fetchArtists(), fetchHeroCards(),
+          fetchArtists(), fetchHeroCards(), fetchJobs(),
         ]);
       console.log('📊 Google Sheets data loaded:', {
         testimonials: testimonials.length,
@@ -50,8 +51,9 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
         awards: awards.length,
         artists: artists.length,
         heroCards: heroCards.length,
+        jobs: jobs.length,
       });
-      setData({ testimonials, talkShow, instagramAwards, instagramPromo, instagramCollab, awards, artists, heroCards, loading: false });
+      setData({ testimonials, talkShow, instagramAwards, instagramPromo, instagramCollab, awards, artists, heroCards, jobs, loading: false });
     } catch (err) {
       console.error('❌ Failed to load config from Google Sheets:', err);
       setData(prev => ({ ...prev, loading: false }));

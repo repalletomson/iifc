@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, ChevronLeft, ChevronRight, ArrowRight, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/lib/themeContext';
+import { useToast } from '@/hooks/use-toast';
 
 /* ─── FEATURED EVENTS (hero carousel) ─── */
 const FEATURED = [
@@ -39,27 +40,22 @@ const FEATURED = [
 ];
 
 /* ─── ALL EVENTS ─── */
-const ALL_EVENTS = [
-  { id: 1, title: "Symphony of Strings", date: "Oct 15, 2025", venue: "NCPA, Mumbai", category: "Concert", img: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=500&q=80", color: "#6c2eb9" },
-  { id: 2, title: "Global Rhythms Festival", date: "Nov 02, 2025", venue: "Royal Albert Hall, London", category: "Festival", img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&q=80", color: "#c13584" },
-  { id: 3, title: "Kathak Masterclass Series", date: "Nov 18, 2025", venue: "IICA Studios, Delhi", category: "Workshop", img: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=500&q=80", color: "#833AB4" },
-  { id: 4, title: "Fusion Evenings", date: "Dec 05, 2025", venue: "Chowdiah Hall, Bangalore", category: "Concert", img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80", color: "#E1306C" },
-  { id: 5, title: "Legacy Awards Night", date: "Dec 20, 2025", venue: "Taj Lands End, Mumbai", category: "Awards", img: "https://images.unsplash.com/photo-1571266028560-20d3234b0e39?w=500&q=80", color: "#d4a853" },
-  { id: 6, title: "Classical Voices Conclave", date: "Jan 10, 2026", venue: "Music Academy, Chennai", category: "Concert", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&q=80", color: "#833AB4" },
-  { id: 7, title: "Rhythm & Beats Night", date: "Feb 14, 2026", venue: "Habitat Centre, Delhi", category: "Performance", img: "https://images.unsplash.com/photo-1598387993281-cecf8b71a8f8?w=500&q=80", color: "#C13584" },
-  { id: 8, title: "Art of Abhinaya", date: "Mar 05, 2026", venue: "Online Virtual Event", category: "Workshop", img: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=500&q=80", color: "#6c2eb9" },
-  { id: 9, title: "Sarod Soiree", date: "Mar 22, 2026", venue: "ITC Royal Bengal, Kolkata", category: "Concert", img: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=500&q=80", color: "#E1306C" },
-  { id: 10, title: "Young Maestros Showcase", date: "Apr 10, 2026", venue: "Nehru Centre, Mumbai", category: "Performance", img: "https://images.unsplash.com/photo-1501386761578-eaa54b4e9d07?w=500&q=80", color: "#833AB4" },
-  { id: 11, title: "Hindustani Vocal Evening", date: "Apr 28, 2026", venue: "Kamani Auditorium, Delhi", category: "Concert", img: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80", color: "#C13584" },
-  { id: 12, title: "IICA Annual Gala", date: "May 15, 2026", venue: "ITC Grand Chola, Chennai", category: "Awards", img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500&q=80", color: "#d4a853" },
-];
+const ALL_EVENTS: { id: number; title: string; date: string; venue: string; category: string; img: string; color: string }[] = [];
 
 const CATEGORIES = ["All", "Concert", "Festival", "Workshop", "Awards", "Performance", "Summit"];
 
 export default function Events() {
   const { theme } = useTheme();
+  const { toast } = useToast();
   const [featIdx, setFeatIdx] = useState(0);
   const [activeCategory, setActiveCategory] = useState("All");
+
+  const handleBookTicket = () => {
+    toast({
+      title: "Coming Soon!",
+      description: "Events are coming soon. This is a demo event — stay tuned for real event announcements!",
+    });
+  };
 
   /* Auto-advance featured carousel */
   useEffect(() => {
@@ -121,7 +117,7 @@ export default function Events() {
                   <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#C13584]" />{feat.date}</span>
                   <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />{feat.venue}</span>
                 </div>
-                <Button className="gradient-bg text-white h-10 px-6 text-sm rounded-md hover:opacity-90 font-semibold">
+                <Button onClick={handleBookTicket} className="gradient-bg text-white h-10 px-6 text-sm rounded-md hover:opacity-90 font-semibold">
                   <Ticket className="w-4 h-4 mr-2" /> Book Tickets
                 </Button>
               </motion.div>
@@ -239,7 +235,7 @@ export default function Events() {
                     </div>
 
                     {/* Hover CTA */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div onClick={handleBookTicket} className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="gradient-bg text-white text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1.5">
                         <Ticket className="w-3 h-3" /> Book Now
                       </div>
@@ -263,7 +259,9 @@ export default function Events() {
 
           {filtered.length === 0 && (
             <div className={`text-center py-20 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>
-              <p className="text-lg">No events in this category yet.</p>
+              <Calendar className="w-12 h-12 mx-auto mb-4 opacity-40" />
+              <p className="text-xl font-semibold">Events are coming soon!</p>
+              <p className="text-sm mt-2 opacity-70">Stay tuned — exciting events are being planned.</p>
             </div>
           )}
         </div>

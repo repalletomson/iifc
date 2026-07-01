@@ -11,6 +11,7 @@ const CSV_URLS = {
   awards: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYfuxxiAuDyza7FsazUYoBY_HHclzCIRpG04w7h7gEm1nURuqf4sPaBgoLXLrJp1mgaHS0fZRqNGPy/pub?gid=2131563256&single=true&output=csv",
   artists: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKXgRDO7m1O17pUoCTx49PE7nt9G9UKoc4JxeoOyfECi7kArKKnRy0yW4twqK43ySuXbuq-KpSFg1J/pub?gid=1242756051&single=true&output=csv",
   heroCards: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSXgAuM8u9tTP5M8rrxvoZZ-P44QlklBGGc1TQBxWVf9_6pAFF3LH1J8UTsnrPzY8bIGMEjiyg05sMH/pub?gid=1674246266&single=true&output=csv",
+  jobs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRf81aCyWeegLnPdFD_E1ZEWXbWbkMgYGvu4AXp7FFcA57uEboXyQKPe9VL08FILEZFzqj0H0JYa5_L/pub?gid=2122055784&single=true&output=csv",
 };
 
 // Fetch and parse CSV with proper quoted-field handling (including multi-line fields)
@@ -137,6 +138,7 @@ export interface TalkShowVideo { title: string; videoid: string; desc: string; }
 export interface InstagramReel { name: string; reelcode: string; }
 export interface AwardRecipient { name: string; award: string; year: string; body: string; description: string; reelcode: string; }
 export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; }
+export interface Job { id: string; title: string; category: string; location: string; applyby: string; applylink: string; status: string; featured: string; }
 
 /** A journey section parsed from `## Heading\ntext...` format */
 export interface JourneySection {
@@ -223,4 +225,9 @@ export async function fetchArtists(): Promise<SheetArtist[]> {
 export async function fetchHeroCards() {
   const rows = await fetchCSV(CSV_URLS.heroCards);
   return rowsToObjects(rows);
+}
+
+export async function fetchJobs(): Promise<Job[]> {
+  const rows = await fetchCSV(CSV_URLS.jobs);
+  return rowsToObjects(rows) as unknown as Job[];
 }
