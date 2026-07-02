@@ -129,13 +129,32 @@ export function extractInstagramCode(urlOrId: string): string {
   // instagram.com/reel/CODE or instagram.com/reel/CODE/
   const match = s.match(/instagram\.com\/reel\/([a-zA-Z0-9_-]+)/);
   if (match) return match[1];
+  // instagram.com/p/CODE or instagram.com/p/CODE/
+  const postMatch = s.match(/instagram\.com\/p\/([a-zA-Z0-9_-]+)/);
+  if (postMatch) return postMatch[1];
   // Fallback: return as-is
   return s;
 }
 
+/** Extract both Instagram code AND content type (reel/p) from a full URL or raw code */
+export function extractInstagramInfo(urlOrId: string): { code: string; type: string } {
+  if (!urlOrId) return { code: '', type: 'reel' };
+  const s = urlOrId.trim();
+  // instagram.com/reel/CODE → type = reel
+  const reelMatch = s.match(/instagram\.com\/reel\/([a-zA-Z0-9_-]+)/);
+  if (reelMatch) return { code: reelMatch[1], type: 'reel' };
+  // instagram.com/p/CODE → type = p (post)
+  const postMatch = s.match(/instagram\.com\/p\/([a-zA-Z0-9_-]+)/);
+  if (postMatch) return { code: postMatch[1], type: 'p' };
+  // Raw code without URL → default to reel
+  if (!s.includes('/')) return { code: s, type: 'reel' };
+  // Fallback
+  return { code: s, type: 'reel' };
+}
+
 export interface Testimonial { name: string; role: string; quote: string; img: string; videoid: string; }
 export interface TalkShowVideo { title: string; videoid: string; desc: string; }
-export interface InstagramReel { name: string; reelcode: string; }
+export interface InstagramReel { name: string; reelcode: string; type: string; }
 export interface AwardRecipient { name: string; award: string; year: string; body: string; description: string; reelcode: string; }
 export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; }
 export interface Job { id: string; title: string; category: string; location: string; applyby: string; applylink: string; status: string; featured: string; }
@@ -197,19 +216,24 @@ export async function fetchTalkShow(): Promise<TalkShowVideo[]> {
   return rowsToObjects(rows) as unknown as TalkShowVideo[];
 }
 
+function enrichReelWithType(raw: Record<string, string>): InstagramReel {
+  const info = extractInstagramInfo(raw.reelcode || '');
+  return { name: raw.name || '', reelcode: info.code, type: info.type };
+}
+
 export async function fetchInstagramAwards(): Promise<InstagramReel[]> {
   const rows = await fetchCSV(CSV_URLS.instagramAwards);
-  return rowsToObjects(rows) as unknown as InstagramReel[];
+  return rowsToObjects(rows).map(enrichReelWithType);
 }
 
 export async function fetchInstagramPromo(): Promise<InstagramReel[]> {
   const rows = await fetchCSV(CSV_URLS.instagramPromo);
-  return rowsToObjects(rows) as unknown as InstagramReel[];
+  return rowsToObjects(rows).map(enrichReelWithType);
 }
 
 export async function fetchInstagramCollab(): Promise<InstagramReel[]> {
   const rows = await fetchCSV(CSV_URLS.instagramCollab);
-  return rowsToObjects(rows) as unknown as InstagramReel[];
+  return rowsToObjects(rows).map(enrichReelWithType);
 }
 
 export async function fetchAwards(): Promise<AwardRecipient[]> {
@@ -217,9 +241,26 @@ export async function fetchAwards(): Promise<AwardRecipient[]> {
   return rowsToObjects(rows) as unknown as AwardRecipient[];
 }
 
+/** Sanitize image path from Google Sheets: fix backslashes, relative paths, spaces */
+export function sanitizeImagePath(path: string): string {
+  if (!path) return '';
+  let cleaned = path.trim();
+  // Replace Windows backslashes with forward slashes
+  cleaned = cleaned.replace(/\\/g, '/');
+  // If it's a relative path (not a full URL), ensure it starts with /
+  if (!/^https?:\/\//i.test(cleaned) && !cleaned.startsWith('/')) {
+    cleaned = '/' + cleaned;
+  }
+  // Encode spaces for valid URL
+  cleaned = cleaned.replace(/ /g, '%20');
+  return cleaned;
+}
+
 export async function fetchArtists(): Promise<SheetArtist[]> {
   const rows = await fetchCSV(CSV_URLS.artists);
-  return rowsToObjects(rows) as unknown as SheetArtist[];
+  const artists = rowsToObjects(rows) as unknown as SheetArtist[];
+  // Sanitize image paths from sheet (fix backslashes, spaces, etc.)
+  return artists.map(a => ({ ...a, image: sanitizeImagePath(a.image) }));
 }
 
 export async function fetchHeroCards() {

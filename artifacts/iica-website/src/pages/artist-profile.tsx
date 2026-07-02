@@ -11,6 +11,21 @@ import type { JourneySection } from '@/lib/googleSheets';
 import NotFound from './not-found';
 import { ArtistTestimonialsCarousel } from '@/components/sections/ArtistTestimonialsCarousel';
 
+const ARTIST_AVATARS = [
+  "https://images.unsplash.com/photo-1619983081593-e2ba5b543168?w=400&q=80",
+  "https://images.unsplash.com/photo-1509059852496-f3822ae057bf?w=400&q=80",
+  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80",
+  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80",
+  "https://images.unsplash.com/photo-1520810627419-35e6bce42bca?w=400&q=80",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80",
+  "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=400&q=80",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80",
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80",
+  "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&q=80",
+];
+
 export default function ArtistProfile() {
   const [, params] = useRoute('/artist/:slug');
   const slug = params?.slug;
@@ -96,20 +111,21 @@ export default function ArtistProfile() {
       <div className={`container mx-auto px-6 pb-10 border-b transition-colors ${theme === 'light' ? 'border-border' : 'border-white/8'}`}>
         <Link href="/artists">
           <button className={`flex items-center mb-8 text-sm transition-colors ${theme === 'light' ? 'text-muted-foreground hover:text-foreground' : 'text-gray-500 hover:text-white'}`}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Directory
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Artists
           </button>
         </Link>
 
         <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
           {/* Circle photo */}
           <div className={`w-40 h-40 md:w-52 md:h-52 rounded-full overflow-hidden border-2 shrink-0 ${theme === 'light' ? 'bg-muted border-border' : 'bg-[#111] border-white/10'}`}>
-            {artist.image ? (
-              <img src={artist.image} alt={artist.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#833AB4]/20 to-[#0d0d0d] flex items-center justify-center">
-                <span className={`font-serif text-5xl ${theme === 'light' ? 'text-foreground/10' : 'text-white/20'}`}>{artist.name.charAt(0)}</span>
-              </div>
-            )}
+            <img
+              src={artist.image || ARTIST_AVATARS[0]}
+              alt={artist.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = ARTIST_AVATARS[0];
+              }}
+            />
           </div>
 
           {/* Details */}

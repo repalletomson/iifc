@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from '@/lib/themeContext';
-import { extractInstagramCode } from '@/lib/googleSheets';
+import { useConfig } from '@/lib/configContext';
 
 const membershipFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -28,7 +29,10 @@ const membershipFormSchema = z.object({
 export default function Membership() {
   const { toast } = useToast();
   const { theme } = useTheme();
+  const { instagramPromo, instagramCollab, loading } = useConfig();
   const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const promoScrollRef = React.useRef<HTMLDivElement>(null);
+  const collabScrollRef = React.useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof membershipFormSchema>>({
     resolver: zodResolver(membershipFormSchema),
@@ -138,34 +142,51 @@ export default function Membership() {
             <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Showcase your artistry with premium production values that command respect on the global stage.</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: "Sandipan Parial", code: "DSKrHNPCa33", type: "reel" },
-              { name: "Neecia Majolly", code: "DSHnkrAiZRI", type: "p" },
-              { name: "Abhishek Chouhan", code: "DYANQQ9OZ5k", type: "reel" },
-              { name: "Shatavisha Mukherjee", code: "DRl6iF2ibNS", type: "reel" },
-            ].map((item, i) => (
-              <motion.div 
-                key={item.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
-              >
-                <iframe
-                  src={`https://www.instagram.com/${item.type}/${item.code}/embed/`}
-                  className="w-full aspect-[9/16]"
-                  frameBorder="0"
-                  scrolling="no"
-                  allowTransparency={true}
-                  loading="lazy"
-                />
-                <div className="p-3">
-                  <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
-                </div>
-              </motion.div>
-            ))}
+          <div className="relative">
+            <button 
+              onClick={() => { promoScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div ref={promoScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
+              {instagramPromo.map((item, i) => (
+                <motion.div 
+                  key={item.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`flex-shrink-0 w-[calc(50%-12px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                >
+                  <iframe
+                    src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
+                    className="w-full aspect-[9/16]"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                    loading="lazy"
+                  />
+                  <div className="p-3">
+                    <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <button 
+              onClick={() => { promoScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </section>
@@ -178,33 +199,51 @@ export default function Membership() {
             <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Connect, create, and elevate with peers who share your commitment to excellence.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            {[
-              { name: "Debasmita Bhattacharya", code: "DO3c-GgjGyM" },
-              { name: "Sandeep Vasishta", code: "CdV4q2BPDKR" },
-              { name: "Anirban Bhattacharyya", code: "DXLcnKKDFrX" },
-            ].map((item, i) => (
-              <motion.div 
-                key={item.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
-              >
-                <iframe
-                  src={`https://www.instagram.com/reel/${extractInstagramCode(item.code)}/embed/`}
-                  className="w-full aspect-[9/16]"
-                  frameBorder="0"
-                  scrolling="no"
-                  allowTransparency={true}
-                  loading="lazy"
-                />
-                <div className="p-3">
-                  <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
-                </div>
-              </motion.div>
-            ))}
+          <div className="relative max-w-3xl mx-auto">
+            <button 
+              onClick={() => { collabScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div ref={collabScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
+              {instagramCollab.map((item, i) => (
+                <motion.div 
+                  key={item.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`flex-shrink-0 w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                >
+                  <iframe
+                    src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
+                    className="w-full aspect-[9/16]"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                    loading="lazy"
+                  />
+                  <div className="p-3">
+                    <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <button 
+              onClick={() => { collabScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </section>

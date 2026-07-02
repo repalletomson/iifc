@@ -130,12 +130,6 @@ export default function Home() {
   // Only use Google Sheets artists — same as Artists page
   const activeArtists = config.artists.map(a => ({ slug: a.slug, name: a.name, image: a.image }));
 
-  /* Auto-advance testimonials */
-  useEffect(() => {
-    const t = setInterval(() => setTalkIdx(i => (i + 1) % activeTestimonials.length), 6000);
-    return () => clearInterval(t);
-  }, [activeTestimonials.length]);
-
   /* Cycle typing: "EMPOWERING ARTISTS" → "EMPOWERING PERFORMERS" → "EMPOWERING CREATORS" → loop */
   const cyclingLine = useCycleTyping("EMPOWERING ", ["ARTISTS,", "MUSICIANS,", "CREATORS,"], 45, 25, 2000);
 
@@ -420,7 +414,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           4. ARTISTS ARE TALKING
           ══════════════════════════════════════════════ */}
-      <section className={`py-12 transition-colors duration-300 ${
+          <section className={`py-12 transition-colors duration-300 ${
         theme === 'light' ? 'bg-background border-t border-border' : 'bg-[#080808] border-t border-white/5'
       }`}>
         <div className="container mx-auto px-6">
@@ -509,6 +503,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
 
       {/* ══════════════════════════════════════════════
           5. IICA ARTISTS — Auto-scrolling carousel
