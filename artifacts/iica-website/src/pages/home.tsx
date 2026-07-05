@@ -62,21 +62,21 @@ const TESTIMONIALS = [
     name: "Aniket Chakravarty",
     role: "Sarod Exponent, Kolkata",
     quote: "IICA gave my artistry a global identity. The life journey documentation and branding transformed how the world sees my classical music.",
-    img: "https://images.unsplash.com/photo-1519802774765-9e3b1e3e6a7e?w=600&q=80",
+    img: "/images/artists/aniket.png",
     videoId: "KWXLJ85ua8s",
   },
   {
     name: "Debasmita Bhattacharya",
     role: "Sarod Player, Kolkata",
     quote: "Finally a platform that understands what classical Indian artists truly need — not just a profile, but a living legacy.",
-    img: "https://images.unsplash.com/photo-1509059852496-f3822ae057bf?w=600&q=80",
+    img: "/images/artists/debasmita.png",
     videoId: "KnXNmUWgeWQ",
   },
   {
     name: "Shatavisha Mukherjee",
     role: "Kathak Dancer, Lucknow",
     quote: "My bookings doubled in six months. IICA's SEO-powered artist page brought audiences I could never reach alone.",
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80",
+    img: "/images/artists/shatavisha.png",
     videoId: "_lH_XfQwkOg",
   },
 ];
@@ -117,7 +117,17 @@ export default function Home() {
 
   // Merge Google Sheets data with fallback
   const activeTestimonials = config.testimonials.length > 0
-    ? config.testimonials.map(t => ({ name: t.name, role: t.role, quote: t.quote, img: t.img, videoId: t.videoid }))
+    ? config.testimonials.map(t => {
+        // Look up matching artist image from the artists sheet
+        const matchedArtist = config.artists.find(a => a.name === t.name);
+        return {
+          name: t.name,
+          role: t.role,
+          quote: t.quote,
+          img: matchedArtist?.image || t.img,
+          videoId: t.videoid,
+        };
+      })
     : TESTIMONIALS;
 
   const awardsForSection = config.awards.length > 0
@@ -412,95 +422,169 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          4. ARTISTS ARE TALKING
+          4. ARTISTS ARE TALKING — Testimonial Spotlight
           ══════════════════════════════════════════════ */}
-          <section className={`py-12 transition-colors duration-300 ${
+      <section className={`py-16 md:py-20 transition-colors duration-300 ${
         theme === 'light' ? 'bg-background border-t border-border' : 'bg-[#080808] border-t border-white/5'
       }`}>
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {/* Section heading */}
+          <h2 className={`font-sans font-black uppercase mb-8 ${
+            theme === 'light' ? 'text-foreground' : 'text-white'
+          }`} style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)' }}>
+            ARTISTS ARE <span className="gradient-text">TALKING</span>
+          </h2>
 
-            {/* Left: big heading + YouTube */}
-            <div>
-              <h2 className={`font-sans font-black leading-[0.9] uppercase mb-6 ${
-                theme === 'light' ? 'text-foreground' : 'text-white'
-              }`} style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)' }}>
-                ARTISTS<br />ARE<br />TALKING
-              </h2>
-              <div className={`rounded-xl overflow-hidden aspect-video max-w-lg ${
-                theme === 'light' ? 'bg-gray-100 shadow-md' : 'bg-[#111]'
-              }`}>
-                <iframe
-                  width="100%" height="100%" className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${extractYoutubeId(activeTestimonials[talkIdx].videoId)}?rel=0&modestbranding=1&autoplay=0`}
-                  title="Artist Testimonial" frameBorder="0"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={talkIdx}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+              className={`relative rounded-2xl overflow-hidden max-w-4xl mx-auto ${
+                theme === 'light'
+                  ? 'bg-white border border-[#ece8e4] shadow-sm'
+                  : 'bg-[#161211] shadow-2xl shadow-black/50'
+              }`}
+            >
+              {/* Diagonal stripe pattern overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  opacity: theme === 'light' ? 0.035 : 0.08,
+                  backgroundImage: `repeating-linear-gradient(100deg, transparent 0px, transparent 38px, ${theme === 'light' ? '#833AB4' : '#ffffff'} 39px, transparent 40px)`,
+                }}
+              />
 
-            {/* Right: photo + quote */}
-            <div>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={talkIdx}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className={`rounded-xl overflow-hidden aspect-[4/3] mb-4 max-w-md ${
-                    theme === 'light' ? 'bg-gray-100 shadow-md' : 'bg-[#111]'
-                  }`}>
-                    <img src={activeTestimonials[talkIdx].img} alt={activeTestimonials[talkIdx].name} className="w-full h-full object-cover" />
-                  </div>
-                  <blockquote className={`text-base font-medium leading-snug mb-4 max-w-md ${
-                    theme === 'light' ? 'text-foreground' : 'text-white'
-                  }`}>
-                    "{activeTestimonials[talkIdx].quote}"
-                  </blockquote>
-                  <div className="flex items-center gap-3">
-                    <img src={activeTestimonials[talkIdx].img} alt="" className="w-8 h-8 rounded-full object-cover" />
-                    <div>
-                      <p className={`font-semibold text-sm ${
-                        theme === 'light' ? 'text-foreground' : 'text-white'
-                      }`}>{activeTestimonials[talkIdx].name}</p>
-                      <p className={`text-xs ${
-                        theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'
-                      }`}>{activeTestimonials[talkIdx].role}</p>
+              {/* ── Main content: photo (left) + quote (right) ── */}
+              <div className="relative grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 md:gap-10 p-8 md:p-14 items-center">
+                
+                {/* ── Left: Photo + role label ── */}
+                <div className="flex flex-col items-center gap-4">
+                  {/* Gradient ring around photo */}
+                  <div className="relative w-[140px] h-[140px] md:w-[150px] md:h-[150px] rounded-full p-[3px] bg-gradient-to-br from-[#C13584] to-[#833AB4]">
+                    <div className={`w-full h-full rounded-full overflow-hidden border-[3px] ${
+                      theme === 'light' ? 'border-white' : 'border-[#161211]'
+                    }`}>
+                      {activeTestimonials[talkIdx].img ? (
+                        <img
+                          src={activeTestimonials[talkIdx].img}
+                          alt={activeTestimonials[talkIdx].name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#C13584] to-[#833AB4] flex items-center justify-center text-white text-3xl font-medium">
+                          {activeTestimonials[talkIdx].name.split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
+                        </div>
+                      )}
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
 
-              <div className="flex items-center gap-3 mt-7">
-                <button 
-                  onClick={() => setTalkIdx(i => (i - 1 + activeTestimonials.length) % activeTestimonials.length)} 
-                  className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
-                    theme === 'light'
-                      ? 'border-border hover:border-accent hover:bg-accent/10'
-                      : 'border-white/20 hover:border-white/50 hover:bg-white/5'
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={() => setTalkIdx(i => (i + 1) % activeTestimonials.length)} 
-                  className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
-                    theme === 'light'
-                      ? 'border-border hover:border-accent hover:bg-accent/10'
-                      : 'border-white/20 hover:border-white/50 hover:bg-white/5'
-                  }`}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <span className={`text-xs ml-1 ${
-                  theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'
-                }`}>{talkIdx + 1} / {activeTestimonials.length}</span>
+                  {/* Role label below photo */}
+                  <p
+                    className="text-[11px] tracking-[0.12em] uppercase text-center"
+                    style={{ color: '#8a8580' }}
+                  >
+                    {activeTestimonials[talkIdx].role?.split(',')[0] || activeTestimonials[talkIdx].role}
+                  </p>
+                </div>
+
+                {/* ── Right: Quote + attribution ── */}
+                <div>
+                  {/* Eyebrow */}
+                  <p
+                    className="text-[11px] tracking-[0.15em] uppercase mb-2"
+                    style={{ color: theme === 'light' ? '#C13584' : '#d4537e' }}
+                  >
+                    Artists are talking — vol. {String(talkIdx + 1).padStart(2, '0')}
+                  </p>
+
+                  {/* Quote */}
+                  <blockquote
+                    className="font-serif italic text-xl md:text-2xl leading-relaxed mb-6 max-w-[520px]"
+                    style={{ color: theme === 'light' ? '#221f1d' : '#f2efec' }}
+                  >
+                    {activeTestimonials[talkIdx].quote}
+                  </blockquote>
+
+                  {/* Gradient divider + name + role */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-7 h-0.5 rounded-full bg-gradient-to-r from-[#C13584] to-[#833AB4]" />
+                    <div>
+                      <p
+                        className="text-[15px] font-medium"
+                        style={{ color: theme === 'light' ? '#221f1d' : '#f2efec' }}
+                      >
+                        {activeTestimonials[talkIdx].name}
+                      </p>
+                      <p className="text-[13px]" style={{ color: '#8a8580' }}>
+                        {activeTestimonials[talkIdx].role}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+
+              {/* ── Bottom bar: pagination numbers + arrows ── */}
+              <div className="relative flex items-center justify-between px-8 md:px-14 pb-10">
+                {/* Numbered pagination */}
+                <div className="flex gap-5">
+                  {activeTestimonials.map((_: any, i: number) => (
+                    <button
+                      key={i}
+                      onClick={() => setTalkIdx(i)}
+                      className="font-serif text-[15px] transition-colors"
+                      style={{
+                        color: i === talkIdx
+                          ? (theme === 'light' ? '#221f1d' : '#f2efec')
+                          : (theme === 'light' ? '#c7c2bc' : '#5c5854'),
+                      }}
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Prev / Next arrows */}
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => setTalkIdx(i => (i - 1 + activeTestimonials.length) % activeTestimonials.length)}
+                    aria-label="Previous testimonial"
+                    className="w-[38px] h-[38px] rounded-full border flex items-center justify-center text-lg transition-all hover:opacity-70"
+                    style={{
+                      borderColor: theme === 'light' ? '#ded9d3' : '#3a3733',
+                      color: theme === 'light' ? '#221f1d' : '#f2efec',
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={() => setTalkIdx(i => (i + 1) % activeTestimonials.length)}
+                    aria-label="Next testimonial"
+                    className="w-[38px] h-[38px] rounded-full border flex items-center justify-center text-lg transition-all hover:opacity-70"
+                    style={{
+                      borderColor: theme === 'light' ? '#ded9d3' : '#3a3733',
+                      color: theme === 'light' ? '#221f1d' : '#f2efec',
+                    }}
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+
+              {/* ── Progress bar ── */}
+              <div
+                className="relative h-[2px]"
+                style={{ background: theme === 'light' ? '#f0ede9' : '#2a2724' }}
+              >
+                <div
+                  className="h-full bg-gradient-to-r from-[#C13584] to-[#833AB4] transition-all duration-300"
+                  style={{ width: `${((talkIdx + 1) / activeTestimonials.length) * 100}%` }}
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </section>
 
