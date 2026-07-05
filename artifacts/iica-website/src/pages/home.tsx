@@ -502,7 +502,7 @@ export default function Home() {
 
                   {/* Quote */}
                   <blockquote
-                    className="font-serif italic text-xl md:text-2xl leading-relaxed mb-6 max-w-[520px]"
+                    className="font-serif text-xl md:text-2xl leading-relaxed mb-6 max-w-[520px]"
                     style={{ color: theme === 'light' ? '#221f1d' : '#f2efec' }}
                   >
                     {activeTestimonials[talkIdx].quote}
