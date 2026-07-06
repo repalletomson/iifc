@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'wouter';
 import { ChevronLeft, ChevronRight, TrendingUp, RefreshCw, ArrowRight } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { ConsultationModal } from '@/components/sections/ConsultationModal';
 import AwardRecipients from '@/components/sections/AwardRecipients';
 import heroBg from '/images/hero-bg.png';
@@ -110,10 +124,46 @@ const ARTIST_AVATARS = [
   "https://images.unsplash.com/photo-1463453091185-61582044d556?w=300&q=80",
 ];
 
+const membershipFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  email: z.string().email("Please enter a valid email address."),
+  phone: z.string().min(10, "Please enter a valid phone number."),
+  profession: z.string().min(2, "Please enter your profession."),
+  artForm: z.string().min(2, "Please specify your art form."),
+});
+
 export default function Home() {
   const [talkIdx, setTalkIdx] = useState(0);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const config = useConfig();
   const { theme } = useTheme();
+  const { toast } = useToast();
+  const { instagramPromo, instagramCollab } = useConfig();
+  const promoScrollRef = useRef<HTMLDivElement>(null);
+  const collabScrollRef = useRef<HTMLDivElement>(null);
+
+  const form = useForm<z.infer<typeof membershipFormSchema>>({
+    resolver: zodResolver(membershipFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      profession: "",
+      artForm: "",
+    },
+  });
+
+  function onMembershipSubmit(values: z.infer<typeof membershipFormSchema>) {
+    console.log(values);
+    const msg = `*IICA Membership Application*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Art Form:* ${encodeURIComponent(values.artForm)}`;
+    window.open(`https://wa.me/919542758814?text=${msg}`, '_blank', 'noopener,noreferrer');
+    toast({
+      title: "Application Submitted",
+      description: "You are being redirected to WhatsApp. We will get back to you shortly!",
+    });
+    setIsSubmitted(true);
+    form.reset();
+  }
 
   // Merge Google Sheets data with fallback
   const activeTestimonials = config.testimonials.length > 0
@@ -221,11 +271,11 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-3">
-              <Link href="/membership">
+              <a href="#apply">
                 <button className="gradient-bg text-white h-11 px-7 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity">
                   Become a Member →
                 </button>
-              </Link>
+              </a>
               <Link href="/artists">
                 <button className={`h-11 px-7 text-sm font-medium rounded-full transition-all ${
                   theme === 'light'
@@ -417,6 +467,175 @@ export default function Home() {
               </button>
             </ConsultationModal>
             <p className={`text-xs mt-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>No credit card required · Free 30-min session</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          3.5a. SEO-POWERED LIFE JOURNEY
+          ══════════════════════════════════════════════ */}
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-muted' : 'bg-[#0a0a0a]'}`}>
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className={`font-serif text-4xl font-bold mb-6 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>SEO-Powered Life Journey</h2>
+              <p className={`text-lg leading-relaxed mb-8 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
+                When authentic life journeys of artists are published on a secure web platform powered with latest technologies which enable visibility and enhance branding mileage of an artistic brand, it is possible to get authentic data-based proof of an artist's demand, in India & abroad.
+              </p>
+              <ul className="space-y-4">
+                {[
+                  "Digital Legacy Documentation",
+                  "Search Engine Dominance",
+                  "Verified Authentic Data",
+                  "Global Visibility Metrics"
+                ].map((item, i) => (
+                  <li key={i} className={`flex items-center ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>
+                    <div className="w-2 h-2 rounded-full gradient-bg mr-4" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className={`glass-card p-6 rounded-2xl border relative overflow-hidden ${theme === 'light' ? 'border-border' : 'border-white/10'}`}
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#C13584] rounded-full filter blur-[64px] opacity-20" />
+              <div className={`flex items-center justify-between mb-8 pb-4 ${theme === 'light' ? 'border-b border-border' : 'border-b border-white/10'}`}>
+                <h4 className={`font-medium ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Brand Analytics</h4>
+                <span className="text-xs text-green-400">+24.5% Global Reach</span>
+              </div>
+              <div className="h-48 flex items-end justify-between space-x-2">
+                {[40, 70, 45, 90, 65, 100, 85].map((h, i) => (
+                  <div key={i} className="w-full bg-gradient-to-t from-[#833AB4] to-[#C13584] rounded-t-sm opacity-80 hover:opacity-100 transition-opacity" style={{ height: `${h}%` }} />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          3.5b. HD-QUALITY PROMOTION
+          ══════════════════════════════════════════════ */}
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`}>
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className={`font-serif text-4xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>HD-Quality Promotion of Your Craft</h2>
+            <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Showcase your artistry with premium production values that command respect on the global stage.</p>
+          </div>
+          
+          <div className="relative">
+            <button 
+              onClick={() => { promoScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div ref={promoScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
+              {instagramPromo.map((item, i) => (
+                <motion.div 
+                  key={item.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`flex-shrink-0 w-[calc(50%-12px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                >
+                  <iframe
+                    src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
+                    className="w-full aspect-[9/16]"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                    loading="lazy"
+                  />
+                  <div className="p-3">
+                    <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <button 
+              onClick={() => { promoScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          3.5c. COLLABORATION WITH LIKE-MINDED ARTISTS
+          ══════════════════════════════════════════════ */}
+      <section className={`py-24 overflow-hidden transition-colors ${theme === 'light' ? 'bg-muted' : 'bg-[#0a0a0a]'}`}>
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className={`font-serif text-4xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Collaboration with Like-Minded Artists</h2>
+            <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Connect, create, and elevate with peers who share your commitment to excellence.</p>
+          </div>
+
+          <div className="relative max-w-3xl mx-auto">
+            <button 
+              onClick={() => { collabScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div ref={collabScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
+              {instagramCollab.map((item, i) => (
+                <motion.div 
+                  key={item.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`flex-shrink-0 w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                >
+                  <iframe
+                    src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
+                    className="w-full aspect-[9/16]"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                    loading="lazy"
+                  />
+                  <div className="p-3">
+                    <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <button 
+              onClick={() => { collabScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
+              className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                theme === 'light'
+                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </section>
@@ -729,6 +948,114 @@ export default function Home() {
                 }`}>{video.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          8. MEMBERSHIP APPLICATION FORM
+          ══════════════════════════════════════════════ */}
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`} id="apply">
+        <div className="container mx-auto px-6 max-w-2xl">
+          <div className={`glass-card p-10 rounded-2xl gradient-border ${theme === 'light' ? 'bg-card' : ''}`}>
+            {isSubmitted ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-12"
+              >
+                <div className="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className={`font-serif text-3xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Application Received</h3>
+                <p className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}>Our curation committee will review your profile and contact you within 48 hours.</p>
+              </motion.div>
+            ) : (
+              <>
+                <h2 className={`font-serif text-3xl font-bold mb-8 text-center ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Apply for Membership</h2>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onMembershipSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your full name" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Email Address</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="you@example.com" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="+91 98765 43210" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="profession"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Profession</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. Musician, Dancer" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="artForm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Specific Art Form</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. Sitar, Kathak" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full gradient-bg text-white h-14 text-lg mt-8 hover:opacity-90">
+                      Submit Application
+                    </Button>
+                  </form>
+                </Form>
+              </>
+            )}
           </div>
         </div>
       </section>

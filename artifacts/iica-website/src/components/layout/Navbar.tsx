@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useTheme } from '@/lib/themeContext';
 
@@ -115,11 +114,6 @@ export function Navbar() {
                 {isVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </button>
             )}
-            <Link href="/membership">
-              <Button className="gradient-bg text-white border-0 hover:opacity-90 transition-opacity">
-                Become a Member
-              </Button>
-            </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -171,14 +165,6 @@ export function Navbar() {
               ))}
               <div className="pt-8 space-y-4">
                 <ThemeToggle />
-                <Link href="/membership">
-                  <Button 
-                    className="w-full gradient-bg text-white h-14 text-lg"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Become a Member
-                  </Button>
-                </Link>
               </div>
             </div>
           </motion.div>

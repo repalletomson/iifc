@@ -169,7 +169,7 @@ export default function About() {
             <p className={`text-lg leading-relaxed mb-8 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>
               If you are a professional performing artist eager to make steady progress in your career path, we welcome you to explore our Premium Artist offerings. <strong className={`${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Talk to us!</strong>
             </p>
-            <Link href="/membership">
+            <Link href="/#apply">
               <button className="gradient-bg text-white h-11 px-8 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto">
                 Premium Artist Offerings <ArrowRight className="w-4 h-4" />
               </button>

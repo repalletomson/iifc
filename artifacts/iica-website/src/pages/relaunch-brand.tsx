@@ -172,7 +172,7 @@ export default function RelaunchBrand() {
         <div className="container mx-auto px-6">
           <h2 className={`font-serif text-4xl font-bold mb-6 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Your Audience is Waiting.</h2>
           <p className={`text-xl mb-10 max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Don't let poor branding hold back phenomenal talent. Relaunch with IICA today.</p>
-          <Link href="/membership">
+          <Link href="/#apply">
             <Button className="gradient-bg text-white h-16 px-12 text-xl hover:opacity-90 rounded-full">
               Start Relaunch <ArrowRight className="ml-2 w-5 h-5" />
             </Button>

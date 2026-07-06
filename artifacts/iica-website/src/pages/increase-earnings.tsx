@@ -71,7 +71,7 @@ export default function IncreaseEarnings() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <Link href="/membership">
+            <Link href="/#apply">
               <Button className="gradient-bg text-white h-14 px-10 text-lg hover:opacity-90">
                 Start Your Journey
               </Button>
@@ -142,7 +142,7 @@ export default function IncreaseEarnings() {
       <section className={`py-24 text-center transition-colors duration-300 ${theme === 'light' ? 'bg-muted border-t border-border' : 'bg-black'}`}>
         <div className="container mx-auto px-6">
           <h2 className={`font-serif text-4xl font-bold mb-8 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Ready to Elevate Your Worth?</h2>
-          <Link href="/membership">
+          <Link href="/#apply">
             <Button className="gradient-bg text-white h-16 px-12 text-xl hover:opacity-90 rounded-full">
               Apply for Membership <ArrowRight className="ml-2 w-5 h-5" />
             </Button>

@@ -21,7 +21,6 @@ function ScrollToTop() {
 
 // Pages
 import Home from '@/pages/home';
-import Membership from '@/pages/membership';
 import Artists from '@/pages/artists';
 import ArtistProfile from '@/pages/artist-profile';
 import Events from '@/pages/events';
@@ -43,7 +42,6 @@ function Router() {
         <AnimatePresence mode="wait">
           <Switch>
             <Route path="/" component={Home} />
-            <Route path="/membership" component={Membership} />
             <Route path="/artists" component={Artists} />
             <Route path="/artist/:slug" component={ArtistProfile} />
             <Route path="/events" component={Events} />
