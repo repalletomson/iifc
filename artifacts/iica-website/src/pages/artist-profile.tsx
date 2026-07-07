@@ -253,7 +253,7 @@ export default function ArtistProfile() {
               <section>
                 <SectionHeading>Life Timeline</SectionHeading>
                 <div className={`relative ml-3 space-y-10 ${theme === 'light' ? 'border-l border-border' : 'border-l border-white/10'}`}>
-                  {artist.milestones.map((milestone, index) => (
+                  {artist.milestones.map((milestone: { year: string; title: string; description: string }, index: number) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -15 }}
@@ -284,7 +284,7 @@ export default function ArtistProfile() {
                   <Trophy className="w-5 h-5" /> Awards & Recognition
                 </h3>
                 <div className="space-y-4">
-                  {artist.awards.map((award, index) => (
+                  {artist.awards.map((award: { title: string; year: string }, index: number) => (
                     <div key={index} className={`flex justify-between items-start gap-3 pb-4 last:pb-0 border-b last:border-0 ${theme === 'light' ? 'border-border' : 'border-white/5'}`}>
                       <span className={`text-sm leading-relaxed ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>{award.title}</span>
                       <span className="text-[#d4a853] text-sm shrink-0 font-medium">{award.year}</span>
