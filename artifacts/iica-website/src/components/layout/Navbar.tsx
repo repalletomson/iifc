@@ -101,20 +101,22 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggle />
-            {location === '/' && (
-              <button
-                onClick={toggleVideoMute}
-                className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${
-                  theme === 'light'
-                    ? 'bg-muted/50 text-foreground hover:bg-muted border border-border/50'
-                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/15'
-                }`}
-                aria-label={isVideoMuted ? 'Unmute video' : 'Mute video'}
-              >
-                {isVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
-            )}
           </div>
+
+          {/* Video Mute Toggle — visible on all screens */}
+          {location === '/' && (
+            <button
+              onClick={toggleVideoMute}
+              className={`w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${
+                theme === 'light'
+                  ? 'bg-muted/50 text-foreground hover:bg-muted border border-border/50'
+                  : 'bg-white/10 text-white hover:bg-white/20 border border-white/15'
+              }`}
+              aria-label={isVideoMuted ? 'Unmute video' : 'Mute video'}
+            >
+              {isVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
+          )}
 
           {/* Mobile Menu Toggle */}
           <button

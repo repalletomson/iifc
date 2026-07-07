@@ -135,6 +135,7 @@ const membershipFormSchema = z.object({
 export default function Home() {
   const [talkIdx, setTalkIdx] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [seoFullscreen, setSeoFullscreen] = useState(false);
   const config = useConfig();
   const { theme } = useTheme();
   const { toast } = useToast();
@@ -472,6 +473,35 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
+          MEMBERSHIP HEADING
+          ══════════════════════════════════════════════ */}
+      <section className={`relative py-24 md:py-32 overflow-hidden transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`}>
+        <div className="absolute inset-0 z-0">
+          <div className={`absolute inset-0 bg-gradient-to-b pointer-events-none ${theme === 'light' ? 'from-[#833AB4]/10 via-[#C13584]/5 to-background' : 'from-[#833AB4]/20 via-[#C13584]/10 to-black'}`} />
+        </div>
+        <div className="container relative z-10 mx-auto px-6 text-center max-w-4xl">
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className={`font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}
+          >
+            Exclusive Membership <br/>
+            <span className="gradient-text">with IICA</span>
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className={`text-xl ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}
+          >
+            Elevating your brand value beyond a lifetime. Join a curated network of India's finest classical and traditional artists.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
           3.5a. SEO-POWERED LIFE JOURNEY
           ══════════════════════════════════════════════ */}
       <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-muted' : 'bg-[#0a0a0a]'}`}>
@@ -505,17 +535,18 @@ export default function Home() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className={`glass-card p-6 rounded-2xl border relative overflow-hidden ${theme === 'light' ? 'border-border' : 'border-white/10'}`}
+              className="cursor-pointer group relative overflow-hidden rounded-2xl border border-border max-w-[92%] mx-auto"
+              onClick={() => setSeoFullscreen(true)}
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#C13584] rounded-full filter blur-[64px] opacity-20" />
-              <div className={`flex items-center justify-between mb-8 pb-4 ${theme === 'light' ? 'border-b border-border' : 'border-b border-white/10'}`}>
-                <h4 className={`font-medium ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Brand Analytics</h4>
-                <span className="text-xs text-green-400">+24.5% Global Reach</span>
-              </div>
-              <div className="h-48 flex items-end justify-between space-x-2">
-                {[40, 70, 45, 90, 65, 100, 85].map((h, i) => (
-                  <div key={i} className="w-full bg-gradient-to-t from-[#833AB4] to-[#C13584] rounded-t-sm opacity-80 hover:opacity-100 transition-opacity" style={{ height: `${h}%` }} />
-                ))}
+              <img
+                src="/images/seo.jpeg"
+                alt="SEO-Powered Life Journey — Brand Analytics"
+                className="w-full h-auto max-h-[380px] object-contain rounded-2xl transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 rounded-2xl flex items-center justify-center">
+                <span className="text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Click to expand
+                </span>
               </div>
             </motion.div>
           </div>
@@ -1059,6 +1090,38 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════
+          SEO Fullscreen Image Overlay
+          ══════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {seoFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 cursor-pointer"
+            onClick={() => setSeoFullscreen(false)}
+          >
+            <motion.img
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              src="/images/seo.jpeg"
+              alt="SEO-Powered Life Journey — Full View"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            />
+            <button
+              onClick={(e) => { e.stopPropagation(); setSeoFullscreen(false); }}
+              className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xl transition-colors"
+              aria-label="Close fullscreen"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
