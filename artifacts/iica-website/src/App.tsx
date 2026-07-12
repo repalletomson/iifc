@@ -6,9 +6,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence } from 'framer-motion';
 import { ConfigProvider } from '@/lib/configContext';
 import { ThemeProvider } from '@/lib/themeContext';
+import { DataErrorBanner } from '@/components/ui/DataErrorBanner';
 
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { WhatsAppFloating } from '@/components/sections/WhatsAppFloating';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -33,6 +35,48 @@ import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
+// Error Boundary for catching runtime errors
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('App Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground p-6">
+          <div className="max-w-md text-center space-y-4">
+            <h1 className="text-3xl font-bold text-red-500">Something went wrong</h1>
+            <p className="text-muted-foreground">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="gradient-bg text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity"
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 function Router() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -55,24 +99,28 @@ function Router() {
         </AnimatePresence>
       </main>
       <Footer />
+      <WhatsAppFloating />
     </div>
   );
 }
 
 function App() {
   return (
-    <ThemeProvider>
-      <ConfigProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-            </WouterRouter>
-            <Toaster />
-          </TooltipProvider>
-        </QueryClientProvider>
-      </ConfigProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <ConfigProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <DataErrorBanner />
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+              </WouterRouter>
+              <Toaster />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </ConfigProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

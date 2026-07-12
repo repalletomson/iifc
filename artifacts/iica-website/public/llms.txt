@@ -1,0 +1,26 @@
+# IICA — International Indian Culture & Arts
+
+IICA is India's premier platform for performing artists — classical musicians, dancers, and cultural performers. We provide premium artist branding, SEO-powered life journey documentation, and international outreach solutions.
+
+## About
+
+IICA (International Indian Culture & Arts) empowers Indian performing artists to build professional brands, grow their earnings, and connect with audiences globally. We serve 500+ artists across classical music, dance, and traditional performing arts.
+
+## Pages
+
+- [Home](https://iifc.vercel.app/) — Platform overview, artist network, talk show, and membership
+- [Artists](https://iifc.vercel.app/artists) — Browse IICA artist profiles
+- [Increase Earnings](https://iifc.vercel.app/increase-earnings) — How IICA helps artists increase brand earnings by 80%
+- [Relaunch Brand](https://iifc.vercel.app/relaunch-brand) — Brand relaunch and performing arts professional preparation
+- [CEO's Desk](https://iifc.vercel.app/ceo) — Message and vision from IICA leadership
+- [About Us](https://iifc.vercel.app/about) — Mission, team, and history
+- [Events](https://iifc.vercel.app/events) — Upcoming and past events
+- [Jobs & Gigs](https://iifc.vercel.app/jobs) — Opportunities for artists
+
+## Contact
+
+- Email: iica.app.2023@gmail.com
+- Address: 07/3, 2nd Floor, 18th Main Road, Jayanagara, Bangalore-560041, Karnataka, India
+- Instagram: https://www.instagram.com/iica.app_official/
+- YouTube: https://www.youtube.com/@iicaApp
+- Facebook: https://www.facebook.com/iica.app.official

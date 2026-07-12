@@ -3,7 +3,7 @@ import { SiWhatsapp } from 'react-icons/si';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/lib/themeContext';
 
-const WHATSAPP_NUMBER = '919542758814'; // +91 95427 58814 → digits only
+const WHATSAPP_NUMBER = '918584853301'; // +91 85848 53301 → digits only
 const DEFAULT_MESSAGE = "Hi! I'd like to connect with IICA.";
 
 export function WhatsAppFloating() {

@@ -6,8 +6,8 @@ import { Link } from 'wouter';
 import { ARTISTS } from '@/data/artists';
 import { useConfig } from '@/lib/configContext';
 import { useTheme } from '@/lib/themeContext';
-import { extractYoutubeId, parseJourney } from '@/lib/googleSheets';
-import type { JourneySection } from '@/lib/googleSheets';
+import { extractYoutubeId, parseJourney, parseAwards, parseLifeTimeline } from '@/lib/googleSheets';
+import type { JourneySection, ParsedAward, ParsedTimelineEntry } from '@/lib/googleSheets';
 import NotFound from './not-found';
 import { ArtistTestimonialsCarousel } from '@/components/sections/ArtistTestimonialsCarousel';
 
@@ -73,7 +73,59 @@ export default function ArtistProfile() {
       } as any
       : null);
 
-  if (!artist) return <NotFound />;
+  // While Google Sheets data is still loading, or if artists list is empty (not yet fetched),
+  // show a skeleton instead of the NotFound page — avoids flash-of-404 on hard reload
+  // and handles the cache-miss race condition where loading=false but artists=[].
+  if (!artist) {
+    if (config.loading || config.artists.length === 0) {
+      return (
+        <div className="min-h-screen pt-24">
+          <div className="container mx-auto px-6 pb-10">
+            {/* Back button placeholder */}
+            <div className="h-5 w-32 rounded bg-muted animate-pulse mb-8" />
+            <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
+              {/* Avatar skeleton */}
+              <div className="w-40 h-40 md:w-52 md:h-52 rounded-full bg-muted animate-pulse shrink-0" />
+              {/* Details skeleton */}
+              <div className="flex-1 pt-2 space-y-3">
+                <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                <div className="h-10 w-64 rounded bg-muted animate-pulse" />
+                <div className="h-4 w-40 rounded bg-muted animate-pulse" />
+                <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+              </div>
+            </div>
+          </div>
+          <div className="container mx-auto px-6 py-10 space-y-4">
+            <div className="h-4 w-full rounded bg-muted animate-pulse" />
+            <div className="h-4 w-5/6 rounded bg-muted animate-pulse" />
+            <div className="h-4 w-4/6 rounded bg-muted animate-pulse" />
+            <div className="h-4 w-full rounded bg-muted animate-pulse" />
+            <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
+          </div>
+        </div>
+      );
+    }
+    // Distinguish "data genuinely missing" from "fetch failed"
+    if (config.error && config.artists.length === 0) {
+      return (
+        <div className="bg-background text-foreground min-h-screen pt-24 flex items-center justify-center">
+          <div className="text-center space-y-4 px-6">
+            <p className="text-lg font-semibold">Unable to load artist data</p>
+            <p className={`text-sm ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
+              {config.error}
+            </p>
+            <button
+              onClick={config.refresh}
+              className="inline-flex items-center gap-2 rounded-full bg-[#C13584] px-5 py-2 text-sm font-medium text-white hover:bg-[#a82d70] transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return <NotFound />;
+  }
 
   const isAniket = artist.slug === 'aniket-chakravarty';
 
@@ -84,6 +136,26 @@ export default function ArtistProfile() {
 
   const hasSheetJourney = journeySections.length > 0;
   const hasLocalJourney = !!(artist as any).fullBio || !!(artist as any).journey;
+
+  // ── Awards from Google Sheets (comma-separated "name,year" per line) ──
+  const sheetAwards: ParsedAward[] = sheetArtist?.awards
+    ? parseAwards(sheetArtist.awards)
+    : [];
+
+  // ── Life Timeline from Google Sheets (comma-separated "year,info,subinfo" per line) ──
+  const sheetTimeline: ParsedTimelineEntry[] = sheetArtist?.lifetimeline
+    ? parseLifeTimeline(sheetArtist.lifetimeline)
+    : [];
+
+  // Merge awards: sheet data takes priority, fall back to local data
+  const mergedAwards: ParsedAward[] = sheetAwards.length > 0
+    ? sheetAwards
+    : ((artist as any).awards || []).map((a: any) => ({ title: a.title, year: a.year }));
+
+  // Merge timeline: sheet data takes priority, fall back to local milestones
+  const mergedTimeline: ParsedTimelineEntry[] = sheetTimeline.length > 0
+    ? sheetTimeline
+    : ((artist as any).milestones || []).map((m: any) => ({ year: m.year, title: m.title, description: m.description }));
 
   // ── YouTube album from artist sheet (comma-separated URLs) ──
   const youtubeUrls = sheetArtist?.youtubevideo
@@ -249,11 +321,11 @@ export default function ArtistProfile() {
             )}
 
             {/* Life Journey Timeline */}
-            {artist.milestones && artist.milestones.length > 0 && (
+            {mergedTimeline.length > 0 && (
               <section>
                 <SectionHeading>Life Timeline</SectionHeading>
                 <div className={`relative ml-3 space-y-10 ${theme === 'light' ? 'border-l border-border' : 'border-l border-white/10'}`}>
-                  {artist.milestones.map((milestone: { year: string; title: string; description: string }, index: number) => (
+                  {mergedTimeline.map((entry, index: number) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -15 }}
@@ -262,9 +334,9 @@ export default function ArtistProfile() {
                       className="relative pl-8"
                     >
                       <div className="absolute w-3 h-3 rounded-full gradient-bg left-[-7px] top-1.5" />
-                      <span className="text-[#C13584] font-bold text-sm">{milestone.year}</span>
-                      <h4 className={`font-serif text-lg font-bold mt-1 mb-1 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{milestone.title}</h4>
-                      <p className={`text-sm leading-relaxed ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>{milestone.description}</p>
+                      <span className="text-[#C13584] font-bold text-sm">{entry.year}</span>
+                      <h4 className={`font-serif text-lg font-bold mt-1 mb-1 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{entry.title}</h4>
+                      <p className={`text-sm leading-relaxed ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>{entry.description}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -278,13 +350,13 @@ export default function ArtistProfile() {
           <div className="space-y-6">
 
             {/* Awards */}
-            {artist.awards && artist.awards.length > 0 && (
+            {mergedAwards.length > 0 && (
               <div className={`border rounded-2xl p-8 transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
                 <h3 className="font-serif text-xl font-bold mb-6 flex items-center gap-2 text-[#d4a853]">
                   <Trophy className="w-5 h-5" /> Awards & Recognition
                 </h3>
                 <div className="space-y-4">
-                  {artist.awards.map((award: { title: string; year: string }, index: number) => (
+                  {mergedAwards.map((award, index: number) => (
                     <div key={index} className={`flex justify-between items-start gap-3 pb-4 last:pb-0 border-b last:border-0 ${theme === 'light' ? 'border-border' : 'border-white/5'}`}>
                       <span className={`text-sm leading-relaxed ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>{award.title}</span>
                       <span className="text-[#d4a853] text-sm shrink-0 font-medium">{award.year}</span>

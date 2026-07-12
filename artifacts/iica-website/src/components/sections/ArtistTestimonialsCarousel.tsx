@@ -37,9 +37,6 @@ export function ArtistTestimonialsCarousel({ testimonials = [] }: ArtistTestimon
   const [isPaused, setIsPaused] = useState(false);
   const autoAdvanceRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // If no testimonials, don't render
-  if (!testimonials || testimonials.length === 0) return null;
-
   const total = testimonials.length;
 
   // Create an extended array for infinite loop feel (triple the array)
@@ -74,6 +71,9 @@ export function ArtistTestimonialsCarousel({ testimonials = [] }: ArtistTestimon
     const idx = ((displayIndex + offset) % extendedTestimonials.length + extendedTestimonials.length) % extendedTestimonials.length;
     return { ...extendedTestimonials[idx], offset, key: `${idx}-${offset}` };
   });
+
+  // All hooks have been called — safe to bail out now
+  if (total === 0) return null;
 
   return (
     <section

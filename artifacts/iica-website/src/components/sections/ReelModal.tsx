@@ -63,6 +63,7 @@ export function ReelModal({ reelCode, name, children }: ReelModalProps) {
         }`}>
           <iframe
             src={`https://www.instagram.com/reel/${extractInstagramCode(reelCode)}/embed/`}
+            title={`Instagram reel by ${name}`}
             className="w-full aspect-[9/16] max-h-[65vh]"
             frameBorder="0"
             scrolling="no"

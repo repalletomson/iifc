@@ -55,7 +55,7 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     const msg = `*Free Consultation Request*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Message:* ${encodeURIComponent(values.message)}`;
-    window.open(`https://wa.me/919542758814?text=${msg}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/918584853301?text=${msg}`, '_blank', 'noopener,noreferrer');
     toast({
       title: "Request Submitted",
       description: "You are being redirected to WhatsApp. We will get back to you shortly!",
@@ -69,10 +69,10 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className={`sm:max-w-[500px] border transition-colors ${
+      <DialogContent className={`sm:max-w-[500px] border transition-colors duration-300 ${
         theme === 'light'
-          ? 'bg-white border-border text-foreground'
-          : 'bg-[#0a0a0a] border-white/10 text-white'
+          ? 'bg-white border-border text-foreground shadow-xl'
+          : 'bg-[#0d0d0d] border-white/10 text-white shadow-[0_0_60px_rgba(0,0,0,0.8)]'
       }`}>
         <DialogHeader>
           <DialogTitle className={`font-serif text-2xl ${
@@ -90,12 +90,14 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Full Name</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Pt. Ravi Shankar" 
-                        className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
-                        {...field} 
+                      <Input
+                        placeholder="Pt. Ravi Shankar"
+                        className={theme === 'light'
+                          ? 'bg-background border-input text-foreground placeholder:text-muted-foreground'
+                          : 'bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-500'}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -108,13 +110,15 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Email</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="artist@example.com" 
-                          type="email" 
-                          className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
-                          {...field} 
+                        <Input
+                          placeholder="artist@example.com"
+                          type="email"
+                          className={theme === 'light'
+                            ? 'bg-background border-input text-foreground placeholder:text-muted-foreground'
+                            : 'bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-500'}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -126,12 +130,14 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Phone</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="+91 98765 43210" 
-                          className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
-                          {...field} 
+                        <Input
+                          placeholder="+91 98765 43210"
+                          className={theme === 'light'
+                            ? 'bg-background border-input text-foreground placeholder:text-muted-foreground'
+                            : 'bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-500'}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -144,12 +150,14 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                 name="profession"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profession / Art Form</FormLabel>
+                    <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Profession / Art Form</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Sitar Player, Kathak Dancer, etc." 
-                        className={theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'} 
-                        {...field} 
+                      <Input
+                        placeholder="Sitar Player, Kathak Dancer, etc."
+                        className={theme === 'light'
+                          ? 'bg-background border-input text-foreground placeholder:text-muted-foreground'
+                          : 'bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-500'}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -161,14 +169,16 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message</FormLabel>
+                    <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Message</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Tell us about your current branding goals..." 
+                      <Textarea
+                        placeholder="Tell us about your current branding goals..."
                         className={`resize-none h-24 ${
-                          theme === 'light' ? 'bg-background border-input' : 'bg-black/50 border-white/10'
+                          theme === 'light'
+                            ? 'bg-background border-input text-foreground placeholder:text-muted-foreground'
+                            : 'bg-[#1a1a1a] border-white/10 text-white placeholder:text-gray-500'
                         }`}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -176,7 +186,7 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
                 )}
               />
               <div className="pt-2">
-                <Button type="submit" className="w-full gradient-bg text-white h-12 text-md">
+                <Button type="submit" className="w-full gradient-bg text-white h-12 text-md hover:opacity-90">
                   Submit Request
                 </Button>
               </div>

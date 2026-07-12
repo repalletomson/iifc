@@ -14,15 +14,40 @@ const CSV_URLS = {
   jobs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRf81aCyWeegLnPdFD_E1ZEWXbWbkMgYGvu4AXp7FFcA57uEboXyQKPe9VL08FILEZFzqj0H0JYa5_L/pub?gid=2122055784&single=true&output=csv",
 };
 
-// Fetch and parse CSV with proper quoted-field handling (including multi-line fields)
-export async function fetchCSV(url: string): Promise<string[][]> {
-  // Add cache-busting timestamp to bypass Google & browser cache
+// Fetch and parse CSV with proper quoted-field handling (including multi-line fields).
+// Includes timeout via AbortController + automatic retries so a single stalled sheet
+// doesn't block the entire config load.
+//
+// Retry strategy: exponential backoff + random jitter to spread retried requests
+// and avoid a thundering herd when multiple tabs / F5 refreshes hit Google at once.
+export async function fetchCSV(
+  url: string,
+  { timeoutMs = 8000, retries = 2 }: { timeoutMs?: number; retries?: number } = {}
+): Promise<string[][]> {
+  // Cache-bust only on the first attempt; retries reuse the same busted URL so we
+  // don't hammer Google with a unique URL on every retry (CDN can't help on miss).
   const cacheBustedUrl = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
-  const res = await fetch(cacheBustedUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`Failed to fetch CSV: ${res.status}`);
-  const text = await res.text();
-  if (!text.trim()) return [];
-  return parseCSVFull(text);
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(cacheBustedUrl, { cache: 'no-store', signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      if (!text.trim()) return [];
+      return parseCSVFull(text);
+    } catch (err) {
+      clearTimeout(timer);
+      if (attempt === retries) throw err;
+      // Exponential backoff + ±30% jitter to avoid thundering-herd on F5 spam:
+      // attempt 0→1: ~800ms ±240ms, attempt 1→2: ~1600ms ±480ms
+      const base = 800 * (attempt + 1);
+      const jitter = Math.random() * base * 0.3 * (Math.random() < 0.5 ? 1 : -1);
+      await new Promise(r => setTimeout(r, Math.max(200, base + jitter)));
+    }
+  }
+  return [];
 }
 
 /**
@@ -156,7 +181,68 @@ export interface Testimonial { name: string; role: string; quote: string; img: s
 export interface TalkShowVideo { title: string; videoid: string; desc: string; }
 export interface InstagramReel { name: string; reelcode: string; type: string; }
 export interface AwardRecipient { name: string; award: string; year: string; body: string; description: string; reelcode: string; }
-export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; }
+export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; }
+
+/** Parsed award entry from sheet: "name,year" per line */
+export interface ParsedAward { title: string; year: string; }
+
+/** Parsed life timeline entry from sheet: "year,info,subinfo" per line */
+export interface ParsedTimelineEntry { year: string; title: string; description: string; }
+
+/**
+ * Parse awards column from Google Sheets.
+ * Format: each line is "Award Name,Year"
+ * Multiple awards separated by newlines within the cell.
+ * Uses the LAST comma on each line to split name from year (names may contain commas).
+ */
+export function parseAwards(text: string): ParsedAward[] {
+  if (!text || !text.trim()) return [];
+  const lines = text.trim().split('\n');
+  const awards: ParsedAward[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const lastComma = trimmed.lastIndexOf(',');
+    if (lastComma === -1) {
+      // No comma — treat entire line as title with empty year
+      awards.push({ title: trimmed, year: '' });
+    } else {
+      const title = trimmed.slice(0, lastComma).trim();
+      const year = trimmed.slice(lastComma + 1).trim();
+      awards.push({ title, year });
+    }
+  }
+  return awards;
+}
+
+/**
+ * Parse life timeline column from Google Sheets.
+ * Format: each line is "Year,Title,Description"
+ * Multiple entries separated by newlines within the cell.
+ * Splits on first two commas; remaining text (including extra commas) becomes description.
+ */
+export function parseLifeTimeline(text: string): ParsedTimelineEntry[] {
+  if (!text || !text.trim()) return [];
+  const lines = text.trim().split('\n');
+  const entries: ParsedTimelineEntry[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const parts = trimmed.split(',');
+    if (parts.length < 2) {
+      // Need at least year and title
+      entries.push({ year: parts[0]?.trim() || '', title: '', description: '' });
+    } else if (parts.length === 2) {
+      entries.push({ year: parts[0].trim(), title: parts[1].trim(), description: '' });
+    } else {
+      const year = parts[0].trim();
+      const title = parts[1].trim();
+      const description = parts.slice(2).join(',').trim();
+      entries.push({ year, title, description });
+    }
+  }
+  return entries;
+}
 export interface Job { id: string; title: string; category: string; location: string; applyby: string; applylink: string; status: string; featured: string; }
 
 /** A journey section parsed from `## Heading\ntext...` format */
@@ -256,11 +342,26 @@ export function sanitizeImagePath(path: string): string {
   return cleaned;
 }
 
+/** Normalize a slug value: lowercase, replace spaces/underscores with hyphens, strip unsafe chars */
+export function normalizeSlug(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')       // spaces & underscores → hyphens
+    .replace(/[^a-z0-9-]/g, '')    // strip anything that isn't a-z, 0-9, or hyphen
+    .replace(/-{2,}/g, '-')        // collapse consecutive hyphens
+    .replace(/^-|-$/g, '');        // trim leading/trailing hyphens
+}
+
 export async function fetchArtists(): Promise<SheetArtist[]> {
   const rows = await fetchCSV(CSV_URLS.artists);
   const artists = rowsToObjects(rows) as unknown as SheetArtist[];
-  // Sanitize image paths from sheet (fix backslashes, spaces, etc.)
-  return artists.map(a => ({ ...a, image: sanitizeImagePath(a.image) }));
+  // Normalize slugs (sheet may have spaces or mixed case) and sanitize image paths
+  return artists.map(a => ({
+    ...a,
+    slug: normalizeSlug(a.slug || a.name),
+    image: sanitizeImagePath(a.image),
+  }));
 }
 
 export async function fetchHeroCards() {

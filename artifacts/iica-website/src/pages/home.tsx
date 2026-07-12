@@ -18,10 +18,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ConsultationModal } from '@/components/sections/ConsultationModal';
 import AwardRecipients from '@/components/sections/AwardRecipients';
+import { LiteYouTube } from '@/components/ui/LiteYouTube';
 import heroBg from '/images/hero-bg.png';
 import { useConfig } from '@/lib/configContext';
+import { ArtistCarouselSkeleton, TalkShowSkeleton, TestimonialSkeleton } from '@/components/ui/skeleton';
 import { useTheme } from '@/lib/themeContext';
-import { extractYoutubeId } from '@/lib/googleSheets';
+import { extractYoutubeId, sanitizeImagePath } from '@/lib/googleSheets';
 
 /* ─── Cycle Typing Hook — types prefix, then cycles through words ─── */
 function useCycleTyping(prefix: string, words: string[], typeSpeed: number = 60, deleteSpeed: number = 35, pauseMs: number = 1500) {
@@ -105,8 +107,8 @@ const TALK_SHOW_VIDEOS = [
 ];
 
 const HERO_CARDS = [
-  { icon: "TrendingUp", label: "Increase Your Artistic Brand Earnings by 80%", desc: "Premium artistic brands follow strategic steps to grow their brand value, win international awards, perform at prestigious concerts, and receive accolades that set them apart — IICA makes this your reality.", gradient: "from-[#C13584] to-[#E1306C]", bgImage: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=80", link: "/increase-earnings" },
-  { icon: "RefreshCw", label: "Prepare to Succeed as Performing Arts Professionals", desc: "India's performing arts market was valued at $3.8 billion in 2023, and is expected to reach $7 billion by 2027. The worldwide arts industry is worth $1.5 trillion.", gradient: "from-[#833AB4] to-[#C13584]", bgImage: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80", link: "/relaunch-brand" },
+  { icon: "TrendingUp", label: "Increase Your Artistic Brand Earnings by 80%", desc: "Premium artistic brands are built by artists who take strategic steps towards growing their brand value at national and international levels — leveraging technology and intelligent process re-engineering to increase earnings by 80%, without any increase in stressful overload.", gradient: "from-[#C13584] to-[#E1306C]", bgImage: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&q=80", link: "/increase-earnings" },
+  { icon: "RefreshCw", label: "Prepare to Succeed as Performing Arts Professionals", desc: "India’s performing arts market is valued at $3.8 billion in 2023 and it is expected to grow to $7 billion by 2027. Worldwide, the arts, entertainment and recreation industry is worth $1.5 Trillion.", gradient: "from-[#833AB4] to-[#C13584]", bgImage: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80", link: "/relaunch-brand" },
 ];
 
 const ARTIST_AVATARS = [
@@ -157,7 +159,7 @@ export default function Home() {
   function onMembershipSubmit(values: z.infer<typeof membershipFormSchema>) {
     console.log(values);
     const msg = `*IICA Membership Application*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Art Form:* ${encodeURIComponent(values.artForm)}`;
-    window.open(`https://wa.me/919542758814?text=${msg}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/918584853301?text=${msg}`, '_blank', 'noopener,noreferrer');
     toast({
       title: "Application Submitted",
       description: "You are being redirected to WhatsApp. We will get back to you shortly!",
@@ -169,13 +171,14 @@ export default function Home() {
   // Merge Google Sheets data with fallback
   const activeTestimonials = config.testimonials.length > 0
     ? config.testimonials.map(t => {
-        // Look up matching artist image from the artists sheet
+        // Use the img column from testimonials sheet directly (sanitized), fallback to artist sheet image
+        const sheetImg = t.img ? sanitizeImagePath(t.img) : '';
         const matchedArtist = config.artists.find(a => a.name === t.name);
         return {
           name: t.name,
           role: t.role,
           quote: t.quote,
-          img: matchedArtist?.image || t.img,
+          img: sheetImg || matchedArtist?.image || t.img,
           videoId: t.videoid,
         };
       })
@@ -185,11 +188,13 @@ export default function Home() {
     ? config.awards.map(a => ({ name: a.name, award: a.award, year: a.year, body: a.body, description: a.description, reelCode: a.reelcode, photos: ["https://images.unsplash.com/photo-1509059852496-f3822ae057bf?w=500&q=80", "https://images.unsplash.com/photo-1520810627419-35e6bce42bca?w=500&q=80", "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&q=80"] }))
     : [];
 
-  const activeTalkShow = config.talkShow.length > 0 ? config.talkShow : TALK_SHOW_VIDEOS;
+  const activeTalkShow = config.loading ? [] : (config.talkShow.length > 0 ? config.talkShow : TALK_SHOW_VIDEOS);
+  const isTalkShowLoading = config.loading;
   const activeHeroCards = config.heroCards.length > 0 ? config.heroCards : HERO_CARDS;
 
   // Only use Google Sheets artists — same as Artists page
-  const activeArtists = config.artists.map(a => ({ slug: a.slug, name: a.name, image: a.image }));
+  const activeArtists = config.loading ? [] : config.artists.map(a => ({ slug: a.slug, name: a.name, image: a.image }));
+  const isArtistsLoading = config.loading;
 
   /* Cycle typing: "EMPOWERING ARTISTS" → "EMPOWERING PERFORMERS" → "EMPOWERING CREATORS" → loop */
   const cyclingLine = useCycleTyping("EMPOWERING ", ["ARTISTS,", "MUSICIANS,", "CREATORS,"], 45, 25, 2000);
@@ -208,9 +213,11 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <video
             autoPlay muted loop playsInline poster={heroBg}
+            preload="none"
             className="w-full h-full object-cover"
           >
             <source src="/hero-video.mp4" type="video/mp4" />
+            <track kind="captions" srcLang="en" label="English captions" default />
           </video>
           {/* Dark theme: reduced overlays so video is visible */}
           {theme === 'dark' && (
@@ -272,7 +279,13 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-3">
-              <a href="#apply">
+              <a
+                href="#membership"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('membership')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
                 <button className="gradient-bg text-white h-11 px-7 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity">
                   Become a Member →
                 </button>
@@ -444,11 +457,11 @@ export default function Home() {
                 } group-hover:opacity-100 transition-opacity mb-5`}>
                   {s.number}
                 </span>
-                <h4 className={`font-bold text-base mb-3 ${
+                <h3 className={`font-bold text-base mb-3 ${
                   theme === 'light' ? 'text-foreground' : 'text-white'
                 }`}>
                   {s.title}
-                </h4>
+                </h3>
                 <p className={`text-sm leading-relaxed ${
                   theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'
                 }`}>{s.desc}</p>
@@ -467,7 +480,7 @@ export default function Home() {
                 <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
               </button>
             </ConsultationModal>
-            <p className={`text-xs mt-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>No credit card required · Free 30-min session</p>
+            {/* <p className={`text-xs mt-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>No credit card required · Free 30-min session</p> */}
           </div>
         </div>
       </section>
@@ -475,7 +488,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           MEMBERSHIP HEADING
           ══════════════════════════════════════════════ */}
-      <section className={`relative py-24 md:py-32 overflow-hidden transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`}>
+      <section id="membership" className={`relative py-24 md:py-32 overflow-hidden transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`}>
         <div className="absolute inset-0 z-0">
           <div className={`absolute inset-0 bg-gradient-to-b pointer-events-none ${theme === 'light' ? 'from-[#833AB4]/10 via-[#C13584]/5 to-background' : 'from-[#833AB4]/20 via-[#C13584]/10 to-black'}`} />
         </div>
@@ -519,8 +532,8 @@ export default function Home() {
               <ul className="space-y-4">
                 {[
                   "Digital Legacy Documentation",
-                  "Search Engine Dominance",
-                  "Verified Authentic Data",
+                  "Search Engine Analytics",
+                  "Yearly Data Updation",
                   "Global Visibility Metrics"
                 ].map((item, i) => (
                   <li key={i} className={`flex items-center ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>
@@ -535,19 +548,23 @@ export default function Home() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="cursor-pointer group relative overflow-hidden rounded-2xl border border-border max-w-[92%] mx-auto"
-              onClick={() => setSeoFullscreen(true)}
+              className="max-w-[92%] mx-auto"
             >
-              <img
-                src="/images/seo.jpeg"
-                alt="SEO-Powered Life Journey — Brand Analytics"
-                className="w-full h-auto max-h-[380px] object-contain rounded-2xl transition-transform duration-300 group-hover:scale-[1.02]"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 rounded-2xl flex items-center justify-center">
-                <span className="text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Click to expand
-                </span>
+              <div 
+                className="cursor-pointer overflow-hidden rounded-2xl border border-border hover:shadow-lg transition-shadow duration-300"
+                onClick={() => setSeoFullscreen(true)}
+              >
+                <img
+                  src="/images/seo.jpeg"
+                  alt="SEO-Powered Life Journey — Brand Analytics"
+                  width={1131}
+                  height={1600}
+                  className="w-full h-auto max-h-[380px] object-contain rounded-2xl transition-transform duration-300 hover:scale-[1.02]"
+                />
               </div>
+              <p className="text-center text-sm mt-2 font-bold text-black">
+                Click this image to see SEO results
+              </p>
             </motion.div>
           </div>
         </div>
@@ -564,50 +581,61 @@ export default function Home() {
           </div>
           
           <div className="relative">
-            <button 
-              onClick={() => { promoScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
-              className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
-                theme === 'light'
-                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
-                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
-              }`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <div ref={promoScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
-              {instagramPromo.map((item, i) => (
-                <motion.div 
-                  key={item.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`flex-shrink-0 w-[calc(50%-12px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+            {instagramPromo.length > 0 ? (
+              <>
+                <button 
+                  onClick={() => { promoScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
+                  aria-label="Scroll promotions left"
+                  className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                    theme === 'light'
+                      ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                      : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+                  }`}
                 >
-                  <iframe
-                    src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
-                    className="w-full aspect-[9/16]"
-                    frameBorder="0"
-                    scrolling="no"
-                    allowTransparency={true}
-                    loading="lazy"
-                  />
-                  <div className="p-3">
-                    <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <button 
-              onClick={() => { promoScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
-              className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
-                theme === 'light'
-                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
-                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
-              }`}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <div ref={promoScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 justify-center [&::-webkit-scrollbar]:hidden">
+                  {instagramPromo.map((item, i) => (
+                    <motion.div 
+                      key={item.name}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className={`flex-shrink-0 w-[calc(50%-12px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                    >
+                      <iframe
+                        src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
+                        title={`Instagram reel: ${item.name}`}
+                        className="w-full aspect-[9/16]"
+                        frameBorder="0"
+                        scrolling="no"
+                        allowTransparency={true}
+                        loading="lazy"
+                      />
+                      <div className="p-3">
+                        <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => { promoScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
+                  aria-label="Scroll promotions right"
+                  className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                    theme === 'light'
+                      ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                      : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+                  }`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <p className={`text-center text-sm py-8 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
+                Content coming soon.
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -623,56 +651,175 @@ export default function Home() {
           </div>
 
           <div className="relative max-w-3xl mx-auto">
-            <button 
-              onClick={() => { collabScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
-              className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
-                theme === 'light'
-                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
-                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
-              }`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <div ref={collabScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
-              {instagramCollab.map((item, i) => (
-                <motion.div 
-                  key={item.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`flex-shrink-0 w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+            {instagramCollab.length > 0 ? (
+              <>
+                <button 
+                  onClick={() => { collabScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' }); }} 
+                  aria-label="Scroll collaborations left"
+                  className={`hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                    theme === 'light'
+                      ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                      : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+                  }`}
                 >
-                  <iframe
-                    src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
-                    className="w-full aspect-[9/16]"
-                    frameBorder="0"
-                    scrolling="no"
-                    allowTransparency={true}
-                    loading="lazy"
-                  />
-                  <div className="p-3">
-                    <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <button 
-              onClick={() => { collabScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
-              className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
-                theme === 'light'
-                  ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
-                  : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
-              }`}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <div ref={collabScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
+                  {instagramCollab.map((item, i) => (
+                    <motion.div 
+                      key={item.name}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className={`flex-shrink-0 w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                    >
+                      <iframe
+                        src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}
+                        title={`Instagram reel: ${item.name}`}
+                        className="w-full aspect-[9/16]"
+                        frameBorder="0"
+                        scrolling="no"
+                        allowTransparency={true}
+                        loading="lazy"
+                      />
+                      <div className="p-3">
+                        <p className={`text-xs font-medium text-center truncate ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{item.name}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => { collabScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' }); }} 
+                  aria-label="Scroll collaborations right"
+                  className={`hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border items-center justify-center transition-all ${
+                    theme === 'light'
+                      ? 'bg-white border-border hover:bg-muted text-foreground shadow-md'
+                      : 'bg-[#1a1a1a] border-white/10 hover:bg-[#222] text-white'
+                  }`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <p className={`text-center text-sm py-8 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
+                Content coming soon.
+              </p>
+            )}
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════
-          4. ARTISTS ARE TALKING — Testimonial Spotlight
+          4. MEMBERSHIP APPLICATION FORM
+          ══════════════════════════════════════════════ */}
+      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`} id="apply">
+        <div className="container mx-auto px-6 max-w-2xl">
+          <div className={`glass-card p-10 rounded-2xl gradient-border ${theme === 'light' ? 'bg-card' : ''}`}>
+            {isSubmitted ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-12"
+              >
+                <div className="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className={`font-serif text-3xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Application Received</h3>
+                <p className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}>Our curation committee will review your profile and contact you within 48 hours.</p>
+              </motion.div>
+            ) : (
+              <>
+                <h2 className={`font-serif text-3xl font-bold mb-8 text-center ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Apply for Membership</h2>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onMembershipSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your full name" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Email Address</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="you@example.com" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="+91 98765 43210" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="profession"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Profession</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. Musician, Dancer" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="artForm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Specific Art Form</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. Sitar, Kathak" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full gradient-bg text-white h-14 text-lg mt-8 hover:opacity-90">
+                      Submit Application
+                    </Button>
+                  </form>
+                </Form>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          5. ARTISTS ARE TALKING — Testimonial Spotlight
           ══════════════════════════════════════════════ */}
       <section className={`py-16 md:py-20 transition-colors duration-300 ${
         theme === 'light' ? 'bg-background border-t border-border' : 'bg-[#080808] border-t border-white/5'
@@ -686,6 +833,9 @@ export default function Home() {
           </h2>
 
           <AnimatePresence mode="wait">
+            {config.loading ? (
+              <TestimonialSkeleton theme={theme} />
+            ) : (
             <motion.div
               key={talkIdx}
               initial={{ opacity: 0 }}
@@ -825,24 +975,24 @@ export default function Home() {
 
               {/* ── Progress bar ── */}
               <div
-                className="relative h-[2px]"
+                className="relative h-[2px] overflow-hidden"
                 style={{ background: theme === 'light' ? '#f0ede9' : '#2a2724' }}
               >
                 <div
-                  className="h-full bg-gradient-to-r from-[#C13584] to-[#833AB4] transition-all duration-300"
-                  style={{ width: `${((talkIdx + 1) / activeTestimonials.length) * 100}%` }}
+                  className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-[#C13584] to-[#833AB4] origin-left transition-transform duration-300"
+                  style={{ transform: `scaleX(${(talkIdx + 1) / activeTestimonials.length})` }}
                 />
               </div>
             </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </section>
 
-
       {/* ══════════════════════════════════════════════
-          5. IICA ARTISTS — Auto-scrolling carousel
+          6. IICA ARTISTS — Auto-scrolling carousel
           ══════════════════════════════════════════════ */}
-      <section className={`py-20 overflow-hidden transition-colors duration-300 ${
+      {/* <section className={`py-20 overflow-hidden transition-colors duration-300 ${
         theme === 'light' 
           ? 'bg-muted border-t border-border' 
           : 'bg-gradient-to-r from-[#1a1a1a] via-[#222] to-[#1a1a1a] border-t border-white/5'
@@ -888,41 +1038,51 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Carousel track */}
           <div id="artists-track" className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
-            {activeArtists.map((artist, i) => (
-              <div
-                key={`${artist.slug}-${i}`}
-                className="flex flex-col items-center gap-3 group flex-shrink-0"
-                style={{ width: '160px' }}
-              >
-                <Link href={`/artist/${artist.slug}`}>
-                  <div className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-2 border-transparent group-hover:border-[#C13584]/60 transition-all duration-300 cursor-pointer ${
-                    theme === 'light' ? 'bg-gray-100' : 'bg-[#111]'
-                  }`}>
-                    <img
-                      src={artist.image || ARTIST_AVATARS[i % ARTIST_AVATARS.length]}
-                      alt={artist.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                </Link>
-                <p className={`text-xs font-medium text-center truncate w-full ${
-                  theme === 'light' ? 'text-foreground' : 'text-white'
-                }`}>{artist.name}</p>
+            {isArtistsLoading ? (
+              <ArtistCarouselSkeleton theme={theme} />
+            ) : activeArtists.length === 0 ? (
+              <div className="flex items-center justify-center w-full py-16">
+                <span className={theme === 'light' ? 'text-muted-foreground text-sm' : 'text-gray-500 text-sm'}>
+                  No artists found
+                </span>
               </div>
-            ))}
+            ) : (
+              activeArtists.map((artist, i) => (
+                <div
+                  key={`${artist.slug}-${i}`}
+                  className="flex flex-col items-center gap-3 group flex-shrink-0"
+                  style={{ width: '160px' }}
+                >
+                  <Link href={`/artist/${artist.slug}`}>
+                    <div className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-2 border-transparent group-hover:border-[#C13584]/60 transition-all duration-300 cursor-pointer ${
+                      theme === 'light' ? 'bg-gray-100' : 'bg-[#111]'
+                    }`}>
+                      <img
+                        src={artist.image}
+                        alt={artist.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    </div>
+                  </Link>
+                  <p className={`text-xs font-medium text-center truncate w-full ${
+                    theme === 'light' ? 'text-foreground' : 'text-white'
+                  }`}>{artist.name}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ══════════════════════════════════════════════
-          6. AWARDS — Redesigned Two-Panel Layout
+          7. AWARDS — Redesigned Two-Panel Layout
           ══════════════════════════════════════════════ */}
       <AwardRecipients awards={awardsForSection} />
 
       {/* ══════════════════════════════════════════════
-          7. ARTISTS - ख़बरें - आज़म — Weekly Talk Show
+          8. ARTISTS - ख़बरें - आज़म — Weekly Talk Show
           ══════════════════════════════════════════════ */}
       <section className={`py-16 transition-colors duration-300 ${
         theme === 'light' 
@@ -938,12 +1098,12 @@ export default function Home() {
               }`}>Artists — ख़बरें — आज़म</h2>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => { const el = document.getElementById('talkshow-track'); if (el) el.scrollBy({ left: -360, behavior: 'smooth' }); }} className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+              <button onClick={() => { const el = document.getElementById('talkshow-track'); if (el) el.scrollBy({ left: -360, behavior: 'smooth' }); }} aria-label="Scroll talk show left" className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
                 theme === 'light'
                   ? 'border-border hover:border-accent hover:bg-accent/10'
                   : 'border-white/20 hover:border-white/50 hover:bg-white/5'
               }`}><ChevronLeft className="w-4 h-4" /></button>
-              <button onClick={() => { const el = document.getElementById('talkshow-track'); if (el) el.scrollBy({ left: 360, behavior: 'smooth' }); }} className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+              <button onClick={() => { const el = document.getElementById('talkshow-track'); if (el) el.scrollBy({ left: 360, behavior: 'smooth' }); }} aria-label="Scroll talk show right" className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
                 theme === 'light'
                   ? 'border-border hover:border-accent hover:bg-accent/10'
                   : 'border-white/20 hover:border-white/50 hover:bg-white/5'
@@ -953,22 +1113,19 @@ export default function Home() {
 
           {/* YouTube video carousel */}
           <div id="talkshow-track" className="flex gap-5 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
-            {activeTalkShow.map((video: any, i: number) => (
+            {isTalkShowLoading ? (
+              <TalkShowSkeleton theme={theme} />
+            ) : (
+              activeTalkShow.map((video: any, i: number) => (
               <div key={i} className="flex-shrink-0 w-[320px]">
                 <div className={`aspect-video rounded-xl overflow-hidden mb-3 ${
                   theme === 'light' 
                     ? 'bg-card border border-border' 
                     : 'bg-[#111] border border-white/5'
                 }`}>
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${extractYoutubeId(video.videoid || video.videoId)}`}
+                  <LiteYouTube
+                    videoId={extractYoutubeId(video.videoid || video.videoId)}
                     title={video.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
                   />
                 </div>
                 <h4 className={`font-semibold text-sm mb-1 ${
@@ -978,114 +1135,7 @@ export default function Home() {
                   theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'
                 }`}>{video.desc}</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          8. MEMBERSHIP APPLICATION FORM
-          ══════════════════════════════════════════════ */}
-      <section className={`py-24 transition-colors ${theme === 'light' ? 'bg-background' : 'bg-black'}`} id="apply">
-        <div className="container mx-auto px-6 max-w-2xl">
-          <div className={`glass-card p-10 rounded-2xl gradient-border ${theme === 'light' ? 'bg-card' : ''}`}>
-            {isSubmitted ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-12"
-              >
-                <div className="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className={`font-serif text-3xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Application Received</h3>
-                <p className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}>Our curation committee will review your profile and contact you within 48 hours.</p>
-              </motion.div>
-            ) : (
-              <>
-                <h2 className={`font-serif text-3xl font-bold mb-8 text-center ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Apply for Membership</h2>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onMembershipSubmit)} className="space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Full Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your full name" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Email Address</FormLabel>
-                            <FormControl>
-                              <Input type="email" placeholder="you@example.com" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Phone Number</FormLabel>
-                            <FormControl>
-                              <Input placeholder="+91 98765 43210" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="profession"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Profession</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Musician, Dancer" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="artForm"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className={theme === 'light' ? 'text-foreground' : 'text-gray-300'}>Specific Art Form</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Sitar, Kathak" className={`h-12 ${theme === 'light' ? 'bg-background border-border' : 'bg-[#111] border-white/10'}`} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <Button type="submit" className="w-full gradient-bg text-white h-14 text-lg mt-8 hover:opacity-90">
-                      Submit Application
-                    </Button>
-                  </form>
-                </Form>
-              </>
+            ))
             )}
           </div>
         </div>

@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Mail, Send } from 'lucide-react';
+import { Mail, Send } from 'lucide-react';
 import { useTheme } from '@/lib/themeContext';
-import { ReelModal } from '@/components/sections/ReelModal';
 import { BlogViewer } from '@/components/sections/CeoDesk/BlogViewer';
-import { extractInstagramCode } from '@/lib/googleSheets';
 
 export default function CEO() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const { theme } = useTheme();
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (email) { setSubscribed(true); setEmail(''); }
+    if (email.trim()) {
+      // Redirect to WhatsApp with newsletter subscription request
+      const msg = `*IICA Newsletter Subscription*%0A%0A*Email:* ${encodeURIComponent(email)}%0A%0AI would like to subscribe to the IICA newsletter.`;
+      window.open(`https://wa.me/918584853301?text=${msg}`, '_blank', 'noopener,noreferrer');
+      setSubscribed(true);
+      setEmail('');
+    }
   };
 
   return (
@@ -30,7 +34,7 @@ export default function CEO() {
 
 
       {/* ── Featured Reels ── */}
-      <section className={`py-16 transition-colors duration-300 ${
+      {/* <section className={`py-16 transition-colors duration-300 ${
         theme === 'light' ? 'bg-background border-t border-border' : 'bg-[#0a0a0a] border-t border-white/8'
       }`}>
         <div className="container mx-auto px-6 max-w-4xl">
@@ -92,7 +96,7 @@ export default function CEO() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
             <section className={`py-10 transition-colors duration-300 ${
         theme === 'light' 
           ? 'bg-[#F8F7F5] border-b border-border' 

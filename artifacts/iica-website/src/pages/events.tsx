@@ -1,43 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, ChevronLeft, ChevronRight, ArrowRight, Ticket } from 'lucide-react';
+import { Calendar, MapPin, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/lib/themeContext';
 import { useToast } from '@/hooks/use-toast';
-
-/* ─── FEATURED EVENTS (hero carousel) ─── */
-const FEATURED = [
-  {
-    id: 1,
-    title: "Annual IICA Global Summit 2025",
-    subtitle: "The confluence of India's greatest classical artists",
-    date: "Sept 25–27, 2025",
-    venue: "The Leela Palace, New Delhi",
-    category: "Summit",
-    bg: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1400&q=80",
-    accent: "#833AB4",
-  },
-  {
-    id: 2,
-    title: "Sur Sadhak Festival — Annual Classical Concert",
-    subtitle: "Presented by Aniket Chakravarty & IICA",
-    date: "Oct 18, 2025",
-    venue: "Rabindra Sadan, Kolkata",
-    category: "Festival",
-    bg: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1400&q=80",
-    accent: "#C13584",
-  },
-  {
-    id: 3,
-    title: "Legacy Awards Night 2025",
-    subtitle: "Honouring India's finest performing artists",
-    date: "Dec 20, 2025",
-    venue: "Taj Lands End, Mumbai",
-    category: "Awards",
-    bg: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1400&q=80",
-    accent: "#E1306C",
-  },
-];
 
 /* ─── ALL EVENTS ─── */
 const ALL_EVENTS: { id: number; title: string; date: string; venue: string; category: string; img: string; color: string }[] = [];
@@ -47,7 +13,6 @@ const CATEGORIES = ["All", "Concert", "Festival", "Workshop", "Awards", "Perform
 export default function Events() {
   const { theme } = useTheme();
   const { toast } = useToast();
-  const [featIdx, setFeatIdx] = useState(0);
   const [activeCategory, setActiveCategory] = useState("All");
 
   const handleBookTicket = () => {
@@ -57,106 +22,57 @@ export default function Events() {
     });
   };
 
-  /* Auto-advance featured carousel */
-  useEffect(() => {
-    const t = setInterval(() => setFeatIdx(i => (i + 1) % FEATURED.length), 5000);
-    return () => clearInterval(t);
-  }, []);
-
   const filtered = activeCategory === "All"
     ? ALL_EVENTS
     : ALL_EVENTS.filter(e => e.category === activeCategory);
-
-  const feat = FEATURED[featIdx];
 
   return (
     <div className="bg-background text-foreground min-h-screen pt-16 transition-colors duration-300">
 
       {/* ══════════════════════════════════════
-          FEATURED CAROUSEL — District.in style
+          BANNER — single static photo
           ══════════════════════════════════════ */}
       <section className="relative h-[62vh] min-h-[420px] overflow-hidden">
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={featIdx}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            className="absolute inset-0"
-          >
-            <img src={feat.bg} alt={feat.title} className="w-full h-full object-cover" />
-            <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-black/60'}`} />
-            <div className={`absolute inset-0 bg-gradient-to-t ${theme === 'light' ? 'from-white via-white/20 to-transparent' : 'from-black via-black/20 to-transparent'}`} />
-            <div className={`absolute inset-0 bg-gradient-to-r ${theme === 'light' ? 'from-white/80 via-transparent to-transparent' : 'from-black/80 via-transparent to-transparent'}`} />
-          </motion.div>
-        </AnimatePresence>
+        <motion.img
+          src="/images/events/event-1.png"
+          alt="IICA Events Banner"
+          initial={{ scale: 1.04, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Overlays for readability */}
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/50' : 'bg-black/50'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-t ${theme === 'light' ? 'from-white via-white/10 to-transparent' : 'from-black via-black/10 to-transparent'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-r ${theme === 'light' ? 'from-white/70 via-transparent to-transparent' : 'from-black/70 via-transparent to-transparent'}`} />
 
         {/* Content */}
-        <div className="relative z-10 h-full flex items-end pb-12">
-          <div className="container mx-auto px-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={featIdx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
-                className="max-w-xl"
-              >
-                <span
-                  className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4"
-                  style={{ background: feat.accent + '30', color: feat.accent, border: `1px solid ${feat.accent}50` }}
-                >
-                  {feat.category}
-                </span>
-                <h1 className={`font-serif text-3xl md:text-4xl font-bold mb-2 leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{feat.title}</h1>
-                <p className={`text-sm mb-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>{feat.subtitle}</p>
-                <div className={`flex flex-wrap gap-4 text-xs mb-6 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
-                  <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#C13584]" />{feat.date}</span>
-                  <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />{feat.venue}</span>
-                </div>
-                <Button onClick={handleBookTicket} className="gradient-bg text-white h-10 px-6 text-sm rounded-md hover:opacity-90 font-semibold">
-                  <Ticket className="w-4 h-4 mr-2" /> Book Tickets
-                </Button>
-              </motion.div>
-            </AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
+          className="relative z-10 h-full flex items-end pb-12"
+        >
+          <div className="container mx-auto px-6 max-w-xl">
+            <span className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4"
+              style={{ background: '#833AB430', color: '#833AB4', border: '1px solid #833AB450' }}>
+              Summit
+            </span>
+            <h1 className={`font-serif text-3xl md:text-4xl font-bold mb-2 leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>
+              Annual IICA Global Summit 2025
+            </h1>
+            <p className={`text-sm mb-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>
+              The confluence of India's greatest classical artists
+            </p>
+            <div className={`flex flex-wrap gap-4 text-xs mb-6 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
+              <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#C13584]" />Sept 25–27, 2025</span>
+              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />The Leela Palace, New Delhi</span>
+            </div>
+            <Button onClick={handleBookTicket} className="gradient-bg text-white h-10 px-6 text-sm rounded-md hover:opacity-90 font-semibold">
+              <Ticket className="w-4 h-4 mr-2" /> Book Tickets
+            </Button>
           </div>
-        </div>
-
-        {/* Prev / Next arrows */}
-        <button
-          onClick={() => setFeatIdx(i => (i - 1 + FEATURED.length) % FEATURED.length)}
-          className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
-            theme === 'light'
-              ? 'bg-card/70 border-border hover:bg-card'
-              : 'bg-black/40 border-white/20 hover:bg-black/70'
-          }`}
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setFeatIdx(i => (i + 1) % FEATURED.length)}
-          className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
-            theme === 'light'
-              ? 'bg-card/70 border-border hover:bg-card'
-              : 'bg-black/40 border-white/20 hover:bg-black/70'
-          }`}
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-
-        {/* Dots */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {FEATURED.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setFeatIdx(i)}
-              className={`h-1 rounded-full transition-all ${i === featIdx ? 'w-6 bg-[#C13584]' : theme === 'light' ? 'w-2 bg-border' : 'w-2 bg-white/30'}`}
-            />
-          ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ══════════════════════════════════════

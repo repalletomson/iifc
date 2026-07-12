@@ -13,17 +13,17 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+  // Read theme synchronously to prevent FOUC (Flash of Unstyled Content)
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'light';
+    const stored = localStorage.getItem("iica-theme") as Theme | null;
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
   const [mounted, setMounted] = useState(false);
 
-  // On mount, read the stored theme or system preference
+  // Mark as mounted
   useEffect(() => {
-    const stored = localStorage.getItem("iica-theme") as Theme | null;
-    if (stored === "light" || stored === "dark") {
-      setThemeState(stored);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setThemeState("dark");
-    }
     setMounted(true);
   }, []);
 

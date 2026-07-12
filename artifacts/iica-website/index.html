@@ -4,7 +4,28 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IICA — Indian Institute of Classical Arts</title>
+    <title>IICA — International Indian Culture & Arts</title>
+    <meta name="description" content="IICA — International Indian Culture & Arts. India's premier platform for performing artists. Build your brand, grow your earnings, and connect with 500+ Indian artists worldwide." />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="IICA — International Indian Culture & Arts" />
+    <meta property="og:description" content="India's premier platform for performing artists. Build your brand, grow your earnings, and connect with 500+ Indian artists worldwide." />
+    <meta property="og:image" content="/opengraph.jpg" />
+    <meta property="og:type" content="website" />
+
+    <!-- Preconnect: only origins we actually load from on page init -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://www.instagram.com" />
+
+    <!-- Preload LCP image (hero poster) -->
+    <link rel="preload" as="image" href="/images/hero-bg.png" fetchpriority="high" />
+
+    <!-- Google Fonts with font-display=swap to avoid render blocking -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Playfair+Display:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>

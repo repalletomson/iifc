@@ -183,6 +183,7 @@ export default function AwardRecipients({
             <div className="w-full max-w-[280px] mx-auto">
               <iframe
                 src={reelEmbedUrl}
+                title={`Award reel for ${current.name}`}
                 className="w-full aspect-[9/16]"
                 frameBorder="0"
                 scrolling="no"

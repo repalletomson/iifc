@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { Link } from 'wouter';
 import { useConfig } from '@/lib/configContext';
 import { useTheme } from '@/lib/themeContext';
+import { ArtistGridSkeleton } from '@/components/ui/skeleton';
 
 const FILTERS = [
   { label: 'All', tag: '' },
@@ -116,7 +117,9 @@ export default function Artists() {
 
       {/* ── Artist grid — EVEN style ── */}
       <div className="container mx-auto px-6 pb-20">
-        {filtered.length === 0 ? (
+        {config.loading ? (
+          <ArtistGridSkeleton theme={theme} />
+        ) : filtered.length === 0 ? (
           <div className={`text-center py-20 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>
             <p className="text-lg">
               {search || activeFilter

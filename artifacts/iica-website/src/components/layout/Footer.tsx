@@ -35,7 +35,7 @@ export function Footer() {
                 IICA
               </span>
               <span className={`block text-[10px] tracking-[0.25em] uppercase mt-1 mb-6 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
-                Advancing Arts & Culture for Humanity
+                International Indian Culture &amp; Arts
               </span>
             </Link>
             <p className="gradient-text font-bold text-xl md:text-2xl leading-snug max-w-[22ch]">
@@ -64,6 +64,7 @@ export function Footer() {
                 href="https://www.facebook.com/iica.app.official"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="IICA on Facebook"
                 className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
                   theme === 'light'
                     ? 'border-border text-muted-foreground hover:text-foreground hover:border-foreground/40'
@@ -76,6 +77,7 @@ export function Footer() {
                 href="https://www.instagram.com/iica.app_official/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="IICA on Instagram"
                 className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
                   theme === 'light'
                     ? 'border-border text-muted-foreground hover:text-[#C13584] hover:border-[#C13584]/40'
@@ -88,6 +90,7 @@ export function Footer() {
                 href="https://www.youtube.com/@iicaApp"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="IICA on YouTube"
                 className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
                   theme === 'light'
                     ? 'border-border text-muted-foreground hover:text-red-500 hover:border-red-500/40'
@@ -114,8 +117,8 @@ export function Footer() {
         <div className={`container mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>
           <p>© 2023 International Indian Culture & Arts (IICA) | Designed By <span className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}>THE GRAPH O CODE</span></p>
           <div className="flex gap-6">
-            <Link href="/terms"><span className={`transition-colors cursor-pointer ${theme === 'light' ? 'hover:text-foreground' : 'hover:text-white'}`}>Terms and Conditions</span></Link>
-            <Link href="/privacy"><span className={`transition-colors cursor-pointer ${theme === 'light' ? 'hover:text-foreground' : 'hover:text-white'}`}>Privacy Policy</span></Link>
+            <a href="mailto:iica.app.2023@gmail.com?subject=Terms%20and%20Conditions%20Request" className={`transition-colors ${theme === 'light' ? 'hover:text-foreground' : 'hover:text-white'}`}>Terms and Conditions</a>
+            <a href="mailto:iica.app.2023@gmail.com?subject=Privacy%20Policy%20Request" className={`transition-colors ${theme === 'light' ? 'hover:text-foreground' : 'hover:text-white'}`}>Privacy Policy</a>
           </div>
         </div>
       </div>

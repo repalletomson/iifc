@@ -1,154 +1,173 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Link } from 'wouter';
-import { TrendingUp, ArrowRight, DollarSign, Target, Award } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useCounter } from '@/hooks/use-counter';
 import { useTheme } from '@/lib/themeContext';
+import { ConsultationModal } from '@/components/sections/ConsultationModal';
 
 function AnimatedPercent() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   const count = useCounter(80, 2500, isInView);
-
   return <span ref={ref}>{count}%</span>;
 }
 
+const steps = [
+  {
+    number: "STEP 1",
+    title: "Designing Your Portfolio of Digital Brand Assets",
+    intro: "Developing your 5-year plan of creating digital assets based on your personalized tastes, talents, & creative aptitude",
+    items: [
+      { label: "Capture:", desc: "Capture leads using our Apps, website, surveys, forms, calendars & more" },
+      { label: "Nurture:", desc: "Industry-standard branding practices in your brand assets nomenclature, Newsletters, FB Pages, Instagram & more" },
+      { label: "Close:", desc: "Use our strategic tools within App to collect reviews, payments, schedule appointments and track analytics" },
+    ],
+  },
+  {
+    number: "STEP 2",
+    title: "Building your branding & sales engine",
+    intro: "Setting up all the tools you need in One App. (a flat suite-platform that enables brand visibility & sales, for performing artists & educators without having to rely on multiple third-parties)",
+    items: [
+      { label: "Create Brandpage, Portfolio Channels, Events Listings:", desc: "" },
+      { label: "", desc: "Our intuitive App allows visibility of your brand name, with video channels, and you can create your performances & events listings" },
+      { label: "Your Brand Archive:", desc: "" },
+      { label: "", desc: "Built right in to the ability to celebrate your LEGACY. You can invite your students & external audience into the rich treasure trove" },
+      { label: "Online Audience Interaction:", desc: "" },
+      { label: "", desc: "The major step for many artistic brands is to capture new audience appointments. Our built-in calendar application solves the problem in a straightforward flow" },
+    ],
+  },
+  {
+    number: "STEP 3",
+    title: "Nurture Audience into Brand Ambassadors",
+    intro: "The backbone of iica.app is what you are able to accomplish after you design your portfolio and engage with your in-App audience",
+    items: [
+      { label: "Easily Launch Brand Loyalty Campaigns:", desc: "" },
+      { label: "", desc: "Our multi-tier content channels allow you to reward engaging audience and capture engaged responses from them" },
+      { label: "Offer Promotional Advantage to Audience Members:", desc: "" },
+      { label: "", desc: "Reward winning audience members as brand ambassadors so as to expand your horizons, organically" },
+      { label: "Run International Outreach Programmes:", desc: "" },
+      { label: "", desc: "Our data intelligence and market insights gathered from foreign countries enable your decision-making process about succeeding as a brand, internationally" },
+    ],
+  },
+];
+
 export default function IncreaseEarnings() {
   const { theme } = useTheme();
-  const steps = [
-    {
-      icon: <Target className="w-8 h-8 text-[#C13584]" />,
-      title: "Strategic Positioning",
-      desc: "We analyze your current brand value and reposition you targeting high-paying global platforms, elite corporate events, and premium festivals."
-    },
-    {
-      icon: <Award className="w-8 h-8 text-[#833AB4]" />,
-      title: "Value Enhancement",
-      desc: "Through SEO optimization, verified digital presence, and high-quality portfolio creation, we justify premium pricing for your performances."
-    },
-    {
-      icon: <DollarSign className="w-8 h-8 text-[#E1306C]" />,
-      title: "Monetization Channels",
-      desc: "Unlock new revenue streams including masterclasses, brand endorsements, digital rights, and exclusive patron subscriptions."
-    }
-  ];
+  const light = theme === 'light';
 
   return (
-    <div className="bg-background text-foreground min-h-screen pt-20 transition-colors duration-300">
-      {/* Hero */}
-      <section className="relative py-24 md:py-32 overflow-hidden flex items-center min-h-[70vh]">
-        <div className={`absolute inset-0 z-0 ${theme === 'light' ? 'bg-muted' : 'bg-[#0a0a0a]'}`} />
-        <div className={`absolute inset-0 z-0 ${theme === 'light' ? 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#833AB4]/5 via-background to-background' : 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#833AB4]/20 via-black to-black'}`} />
-        
-        <div className="container relative z-10 mx-auto px-6 text-center">
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="font-serif text-8xl md:text-[12rem] font-bold gradient-text leading-none mb-6"
+    <div className={`min-h-screen pt-20 transition-colors duration-300 ${light ? 'bg-background text-foreground' : 'bg-black text-gray-100'}`}>
+
+      {/* ── Hero Title ── */}
+      <section className={`py-16 text-center transition-colors ${light ? 'bg-background' : 'bg-black'}`}>
+        <div className="container mx-auto px-6 max-w-3xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-serif text-3xl md:text-4xl font-bold mb-6 text-[#C13584]"
           >
-            <AnimatedPercent />
+            Increase Your Artistic Brand Earnings by 80%
           </motion.h1>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className={`text-3xl md:text-5xl font-serif font-bold mb-8 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}
-          >
-            Increase Your Earnings
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className={`text-xl max-w-2xl mx-auto mb-12 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}
-          >
-            Stop negotiating. Start commanding. Learn how IICA's premium artist branding methodology increases your perceived and actual market value.
-          </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.1 }}
+            className={`text-sm md:text-base leading-relaxed space-y-3 text-left ${light ? 'text-muted-foreground' : 'text-gray-300'}`}
           >
-            <Link href="/#apply">
-              <Button className="gradient-bg text-white h-14 px-10 text-lg hover:opacity-90">
-                Start Your Journey
-              </Button>
-            </Link>
+            <p>
+              <strong className={light ? 'text-foreground' : 'text-white'}>Premium artistic brands</strong> are built by artists who take{' '}
+              <em>strategic steps towards growing their brand value at national and international levels</em>, and those who do not limit their potential to winning local + national awards, performing at a few prestigious concerts, or receiving accolades from credible institutions of repute.
+            </p>
+            <p>
+              However, even they are leaving money on table, due to manual processes of managing their portfolios & project delivery schedules. It is high time you leverage the{' '}
+              <em>power of technology and intelligent process re-engineering</em> in order to increase your earnings by 80%, without any increase in stressful overload.
+            </p>
           </motion.div>
         </div>
       </section>
 
-      {/* The Process */}
-      <section className={`py-24 transition-colors duration-300 ${theme === 'light' ? 'bg-muted border-t border-border' : 'bg-black'}`}>
+      {/* ── Your Artistic Brand Must Succeed ── */}
+      <section className={`py-8 text-center border-y transition-colors ${light ? 'bg-muted border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
+        <div className="container mx-auto px-6 max-w-3xl">
+          <h2 className="font-serif text-2xl font-bold mb-4 text-[#C13584]">Your Artistic Brand Must Succeed</h2>
+          <p className={`text-sm md:text-base leading-relaxed ${light ? 'text-muted-foreground' : 'text-gray-300'}`}>
+            Our technology-powered done-for-you services implement{' '}
+            <em>proven strategies</em> to ensure a seamless and decentralized model of operating your professional portfolio, while you relax, stay focused into performing arts, without wasting hours of pain and research. In a{' '}
+            <em>structured manner of designing your portfolio</em>, we offer award-winning solutions so that your brand succeeds.
+          </p>
+        </div>
+      </section>
+
+      {/* ── So, What Exactly Do We Do ── */}
+      <section className={`py-12 text-center transition-colors ${light ? 'bg-background' : 'bg-black'}`}>
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className={`font-serif text-4xl md:text-5xl font-bold mb-6 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>The 3-Step Methodology</h2>
-            <p className={`max-w-2xl mx-auto text-lg ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Our proven framework transforms talented performers into highly sought-after cultural brands.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`p-10 rounded-3xl relative overflow-hidden group border transition-colors ${
-                  theme === 'light'
-                    ? 'bg-card border-border shadow-md hover:shadow-lg'
-                    : 'bg-[#0d0d0d] border-white/8'
-                }`}
-              >
-                <div className={`absolute top-0 right-0 font-serif text-[8rem] font-bold -mt-10 -mr-4 transition-colors ${
-                  theme === 'light' ? 'text-foreground/[0.02] group-hover:text-[#C13584]/5' : 'text-white/5 group-hover:text-[#C13584]/10'
-                }`}>
-                  {i + 1}
-                </div>
-                <div className="relative z-10">
-                  <div className="mb-8">{step.icon}</div>
-                  <h3 className={`font-serif text-2xl font-bold mb-4 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{step.title}</h3>
-                  <p className={`leading-relaxed ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <h2 className={`font-serif text-2xl md:text-3xl font-bold ${light ? 'text-foreground' : 'text-white'}`}>
+            So, What Exactly Do We Do?
+          </h2>
+          <p className="font-serif text-2xl md:text-3xl font-bold text-[#C13584]">
+            A Step-wise Clarity is Provided Below
+          </p>
         </div>
       </section>
 
-      {/* Testimonial */}
-      <section className={`py-24 transition-colors duration-300 ${theme === 'light' ? 'bg-muted border-t border-border' : 'bg-[#0a0a0a]'}`}>
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <div className={`p-12 md:p-16 rounded-3xl border transition-colors ${
-            theme === 'light'
-              ? 'bg-card border-border shadow-lg'
-              : 'bg-[#0d0d0d] border-white/8'
-          }`}>
-            <TrendingUp className="w-12 h-12 text-[#d4a853] mx-auto mb-8" />
-            <p className={`font-serif text-2xl md:text-3xl italic leading-relaxed mb-10 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-200'}`}>
-              "Before IICA, I was playing 15 concerts a month to make ends meet. Now, I play 4 premium concerts a month at a 300% higher fee. They didn't change my music; they changed how the world perceived my music."
-            </p>
-            <div>
-              <div className={`font-bold text-xl ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>S. Banerjee</div>
-              <div className="text-[#C13584] text-sm uppercase tracking-widest mt-1">IICA Member Artist</div>
-            </div>
-          </div>
+      {/* ── Steps ── */}
+      <section className={`pb-16 transition-colors ${light ? 'bg-background' : 'bg-black'}`}>
+        <div className="container mx-auto px-6 max-w-3xl space-y-8">
+          {steps.map((step, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className={`rounded-2xl p-8 border transition-colors ${
+                light
+                  ? 'bg-card border-border shadow-sm'
+                  : 'bg-[#0d0d0d] border-white/8'
+              }`}
+            >
+              <p className="text-xs font-bold tracking-widest text-[#833AB4] uppercase mb-1">{step.number}</p>
+              <h3 className={`font-serif text-xl font-bold mb-3 ${light ? 'text-foreground' : 'text-white'}`}>{step.title}</h3>
+              {step.intro && (
+                <p className={`text-sm mb-4 leading-relaxed ${light ? 'text-muted-foreground' : 'text-gray-400'}`}>{step.intro}</p>
+              )}
+              <ul className="space-y-2">
+                {step.items.map((item, j) => (
+                  <li key={j} className={`text-sm leading-relaxed flex gap-2 ${light ? 'text-muted-foreground' : 'text-gray-300'}`}>
+                    {item.label && (
+                      <span className={`font-semibold shrink-0 ${light ? 'text-foreground' : 'text-white'}`}>{item.label}</span>
+                    )}
+                    {item.desc && <span>{item.desc}</span>}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className={`py-24 text-center transition-colors duration-300 ${theme === 'light' ? 'bg-muted border-t border-border' : 'bg-black'}`}>
-        <div className="container mx-auto px-6">
-          <h2 className={`font-serif text-4xl font-bold mb-8 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Ready to Elevate Your Worth?</h2>
-          <Link href="/#apply">
-            <Button className="gradient-bg text-white h-16 px-12 text-xl hover:opacity-90 rounded-full">
-              Apply for Membership <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
+      {/* ── Book Free Consultation ── */}
+      <section className={`py-12 border-t transition-colors ${light ? 'bg-muted border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
+        <div className="container mx-auto px-6 max-w-3xl text-center space-y-4">
+          <p className={`text-sm leading-relaxed ${light ? 'text-muted-foreground' : 'text-gray-400'}`}>
+            Also, once you sign up as a Premium Artist, we will send you a FREE copy of the book titled{' '}
+            <em className={light ? 'text-foreground' : 'text-gray-200'}>"Creative Communication Excellence in Arts & Entertainment"</em>, a Powerful Six-Step Process To Live In Deep Creativity And Financial Abundance In 2023 & Beyond.
+          </p>
+          <ConsultationModal>
+            <button className="relative inline-flex items-center gap-2 bg-gradient-to-r from-[#C13584] via-[#833AB4] to-[#405DE6] text-white font-bold text-base px-10 py-4 rounded-full
+              shadow-[0_0_40px_rgba(193,53,132,0.3)] hover:shadow-[0_0_60px_rgba(193,53,132,0.5)]
+              transition-all duration-300 hover:scale-105 active:scale-95
+              before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-r before:from-[#C13584] before:via-[#833AB4] before:to-[#405DE6] before:blur-xl before:opacity-40 before:-z-10">
+              <span className="relative z-10">Book a FREE Consultation</span>
+              <svg className="relative z-10 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+          </ConsultationModal>
+          {/* <p className={`text-xs ${light ? 'text-muted-foreground' : 'text-gray-600'}`}>No credit card required · Free 30-min session</p> */}
         </div>
       </section>
+
     </div>
   );
 }

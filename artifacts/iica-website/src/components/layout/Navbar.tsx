@@ -74,7 +74,7 @@ export function Navbar() {
               IICA
             </span>
             <span className="hidden md:block text-[9px] text-gray-500 tracking-[0.25em] uppercase mt-0.5">
-              Advancing Arts & Culture for Humanity
+              International Indian Culture &amp; Arts
             </span>
           </Link>
 
@@ -122,6 +122,7 @@ export function Navbar() {
           <button
             className={theme === 'light' ? 'md:hidden text-foreground' : 'md:hidden text-white'}
             onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Open navigation menu"
           >
             <Menu className="h-6 w-6" />
           </button>
@@ -145,6 +146,7 @@ export function Navbar() {
             <button
               className={theme === 'light' ? 'absolute top-6 right-6 text-foreground' : 'absolute top-6 right-6 text-white'}
               onClick={() => setIsMobileMenuOpen(false)}
+              aria-label="Close navigation menu"
             >
               <X className="h-8 w-8" />
             </button>
