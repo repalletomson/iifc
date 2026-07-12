@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ConsultationModal } from '@/components/sections/ConsultationModal';
 import AwardRecipients from '@/components/sections/AwardRecipients';
 import { LiteYouTube } from '@/components/ui/LiteYouTube';
-import heroBg from '/images/hero-bg.png';
+import heroBg from '/images/hero-bg.webp';
 import { useConfig } from '@/lib/configContext';
 import { ArtistCarouselSkeleton, TalkShowSkeleton, TestimonialSkeleton } from '@/components/ui/skeleton';
 import { useTheme } from '@/lib/themeContext';
@@ -555,7 +555,7 @@ export default function Home() {
                 onClick={() => setSeoFullscreen(true)}
               >
                 <img
-                  src="/images/seo.jpeg"
+                  src="/images/seo.webp"
                   alt="SEO-Powered Life Journey — Brand Analytics"
                   width={1131}
                   height={1600}
@@ -1158,7 +1158,7 @@ export default function Home() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              src="/images/seo.jpeg"
+              src="/images/seo.webp"
               alt="SEO-Powered Life Journey — Full View"
               className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
             />
