@@ -87,7 +87,7 @@ export function Footer() {
                 <SiInstagram className="w-4 h-4" />
               </a>
               <a
-                href="https://www.youtube.com/@iicaApp"
+                href="https://www.youtube.com/@iica.app_official/videos"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="IICA on YouTube"
@@ -115,7 +115,16 @@ export function Footer() {
       {/* Bottom bar */}
       <div className={`border-t transition-colors ${theme === 'light' ? 'border-border' : 'border-white/8'}`}>
         <div className={`container mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>
-          <p>© 2023 International Indian Culture & Arts (IICA) | Designed By <span className={theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}>THE GRAPH O CODE</span></p>
+          <p>© 2023 International Indian Culture & Arts (IICA) | Designed By{' '}
+            <a
+              href="https://pathway-livid.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`transition-colors hover:underline ${theme === 'light' ? 'text-muted-foreground hover:text-foreground' : 'text-gray-500 hover:text-white'}`}
+            >
+              PATHWAY
+            </a>
+          </p>
           <div className="flex gap-6">
             <a href="mailto:iica.app.2023@gmail.com?subject=Terms%20and%20Conditions%20Request" className={`transition-colors ${theme === 'light' ? 'hover:text-foreground' : 'hover:text-white'}`}>Terms and Conditions</a>
             <a href="mailto:iica.app.2023@gmail.com?subject=Privacy%20Policy%20Request" className={`transition-colors ${theme === 'light' ? 'hover:text-foreground' : 'hover:text-white'}`}>Privacy Policy</a>

@@ -53,6 +53,7 @@ export default function ArtistProfile() {
           tags: sheetArtist.tags
             ? sheetArtist.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
             : localArtist.tags,
+          social_media: sheetArtist.social_media || '',
         } : {}),
       }
     : (sheetArtist ? {
@@ -68,6 +69,7 @@ export default function ArtistProfile() {
         tags: sheetArtist.tags ? sheetArtist.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
         image: sheetArtist.image,
         bio: sheetArtist.bio,
+        social_media: sheetArtist.social_media || '',
         milestones: [],
         awards: [],
       } as any
@@ -221,8 +223,44 @@ export default function ArtistProfile() {
               </div>
             )}
 
-            <div className={`flex items-center gap-4 text-sm ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
+            <div className={`flex items-center gap-4 text-sm flex-wrap ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
               <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />{artist.city}, {artist.country}</span>
+
+              {/* Social media icons — parsed from social_media column (order: instagram, youtube, facebook) */}
+              {(() => {
+                const links = ((artist as any).social_media || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+                const [instagram, facebook, youtube] = links;
+                return (
+                  <span className="flex items-center gap-3">
+                    {instagram && (
+                      <a href={instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                        className="hover:opacity-70 transition-opacity" style={{ color: '#E1306C' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                          <circle cx="12" cy="12" r="4"/>
+                          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+                        </svg>
+                      </a>
+                    )}
+                    {facebook && (
+                      <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+                        className="hover:opacity-70 transition-opacity" style={{ color: '#1877F2' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.5h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/>
+                        </svg>
+                      </a>
+                    )}
+                    {youtube && (
+                      <a href={youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube"
+                        className="hover:opacity-70 transition-opacity" style={{ color: '#FF0000' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+                        </svg>
+                      </a>
+                    )}
+                  </span>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -300,7 +338,7 @@ export default function ArtistProfile() {
                   <p key={i} className={`leading-relaxed mb-4 text-[0.975rem] ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>{para}</p>
                 ))}
                 <p className={`text-xs italic mt-4 pl-4 border-l-2 ${theme === 'light' ? 'text-muted-foreground border-border' : 'text-gray-600 border-white/10'}`}>
-                  The aforementioned content shared about the journey of Aniket Chakravarty is copyright protected and it cannot be shared or distributed without written permission from Taanima Digital Private Limited.
+                  The aforementioned content shared about the journey of Aniket Chakravarty is copyright protected and it cannot be shared or distributed without written permission from  IICA.
                 </p>
               </section>
             )}
@@ -323,7 +361,7 @@ export default function ArtistProfile() {
             {/* Life Journey Timeline */}
             {mergedTimeline.length > 0 && (
               <section>
-                <SectionHeading>Life Timeline</SectionHeading>
+                <SectionHeading>Highlights by Timeline</SectionHeading>
                 <div className={`relative ml-3 space-y-10 ${theme === 'light' ? 'border-l border-border' : 'border-l border-white/10'}`}>
                   {mergedTimeline.map((entry, index: number) => (
                     <motion.div

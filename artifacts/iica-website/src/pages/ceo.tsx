@@ -14,7 +14,7 @@ export default function CEO() {
     if (email.trim()) {
       // Redirect to WhatsApp with newsletter subscription request
       const msg = `*IICA Newsletter Subscription*%0A%0A*Email:* ${encodeURIComponent(email)}%0A%0AI would like to subscribe to the IICA newsletter.`;
-      window.open(`https://wa.me/918584853301?text=${msg}`, '_blank', 'noopener,noreferrer');
+      window.open(`https://wa.me/919901709963?text=${msg}`, '_blank', 'noopener,noreferrer');
       setSubscribed(true);
       setEmail('');
     }
@@ -112,7 +112,7 @@ export default function CEO() {
             <p className={`leading-relaxed ${
               theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'
             }`}>
-              Thank you for visiting this page. Here, <strong className={theme === 'light' ? 'text-foreground' : 'text-white'}>Reshma Patra, CEO of Taanima Digital Private Limited</strong>, shares the most important announcements that are valuable to the community that we serve. We sincerely invite you to share your ideas and thoughts that would help us grow, together. Send your messages to:{' '}
+              Thank you for visiting this page. Here, <strong className={theme === 'light' ? 'text-foreground' : 'text-white'}>Reshma Patra, Founder of I.I.C.A.</strong>, shares the most important announcements that are valuable to the community that we serve. We sincerely invite you to share your ideas and thoughts that would help us grow, together. Send your messages to:{' '}
               <a href="mailto:iica.app.2023@gmail.com" className="text-[#C13584] hover:underline">iica.app.2023@gmail.com</a>
             </p>
             <p className={`text-sm leading-relaxed ${

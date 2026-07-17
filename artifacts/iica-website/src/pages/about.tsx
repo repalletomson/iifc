@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { TrendingUp, Briefcase, BookOpen, ArrowRight, Zap, Globe, Heart } from 'lucide-react';
 import { useCounter } from '@/hooks/use-counter';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useTheme } from '@/lib/themeContext';
 
 function AnimatedCounter({ end, suffix = "" }: { end: number; suffix?: string }) {
@@ -24,7 +24,20 @@ const PILLARS = [
 ];
 
 export default function About() {
+  const [, navigate] = useLocation();
   const { theme } = useTheme();
+
+  function goToOfferings() {
+    navigate('/');
+    // After navigation, wait for the page to render then scroll to the cards
+    setTimeout(() => {
+      const el = document.getElementById('offerings');
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY -80;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 300)  }
+
   return (
     <div className="bg-background text-foreground min-h-screen pt-16 transition-colors duration-300">
 
@@ -169,11 +182,12 @@ export default function About() {
             <p className={`text-lg leading-relaxed mb-8 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>
               If you are a professional performing artist eager to make steady progress in your career path, we welcome you to explore our Premium Artist offerings. <strong className={`${theme === 'light' ? 'text-foreground' : 'text-white'}`}>Talk to us!</strong>
             </p>
-            <Link href="/#apply">
-              <button className="gradient-bg text-white h-11 px-8 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto">
-                Premium Artist Offerings <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
+            <button
+              onClick={goToOfferings}
+              className="gradient-bg text-white h-11 px-8 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+            >
+              Premium Artist Offerings <ArrowRight className="w-4 h-4" />
+            </button>
           </motion.div>
         </div>
       </section>

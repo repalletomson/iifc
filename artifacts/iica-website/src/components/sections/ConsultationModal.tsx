@@ -55,7 +55,7 @@ export function ConsultationModal({ children }: ConsultationModalProps) {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     const msg = `*Free Consultation Request*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Message:* ${encodeURIComponent(values.message)}`;
-    window.open(`https://wa.me/918584853301?text=${msg}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/919901709963?text=${msg}`, '_blank', 'noopener,noreferrer');
     toast({
       title: "Request Submitted",
       description: "You are being redirected to WhatsApp. We will get back to you shortly!",

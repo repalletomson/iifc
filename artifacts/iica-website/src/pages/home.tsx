@@ -19,7 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { ConsultationModal } from '@/components/sections/ConsultationModal';
 import AwardRecipients from '@/components/sections/AwardRecipients';
 import { LiteYouTube } from '@/components/ui/LiteYouTube';
-import heroBg from '/images/hero-bg.webp';
 import { useConfig } from '@/lib/configContext';
 import { ArtistCarouselSkeleton, TalkShowSkeleton, TestimonialSkeleton } from '@/components/ui/skeleton';
 import { useTheme } from '@/lib/themeContext';
@@ -159,7 +158,7 @@ export default function Home() {
   function onMembershipSubmit(values: z.infer<typeof membershipFormSchema>) {
     console.log(values);
     const msg = `*IICA Membership Application*%0A%0A*Name:* ${encodeURIComponent(values.name)}%0A*Email:* ${encodeURIComponent(values.email)}%0A*Phone:* ${encodeURIComponent(values.phone)}%0A*Profession:* ${encodeURIComponent(values.profession)}%0A*Art Form:* ${encodeURIComponent(values.artForm)}`;
-    window.open(`https://wa.me/918584853301?text=${msg}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/919901709963?text=${msg}`, '_blank', 'noopener,noreferrer');
     toast({
       title: "Application Submitted",
       description: "You are being redirected to WhatsApp. We will get back to you shortly!",
@@ -212,7 +211,7 @@ export default function Home() {
         {/* Video bg with image fallback — visible in both themes */}
         <div className="absolute inset-0 z-0">
           <video
-            autoPlay muted loop playsInline poster={heroBg}
+            autoPlay muted loop playsInline
             preload="none"
             className="w-full h-full object-cover"
           >
@@ -271,10 +270,10 @@ export default function Home() {
             </h1>
 
             {/* Sub-copy — single line */}
-            <p className={`text-base whitespace-nowrap mb-7 ${
-              theme === 'light' ? 'text-muted-foreground' : 'text-white'
+            <p className={`text-base mb-7 drop-shadow-[0_1px_3px_rgba(255,255,255,0.5)] ${
+              theme === 'light' ? 'text-gray-900' : 'text-gray-900'
             }`}>
-              Connect, brand, and grow through India's premier platform for performing artists.
+              Connect, brand, and grow through India's premier<br className="sm:hidden" /> platform for performing artists.
             </p>
 
             {/* CTAs */}
@@ -301,9 +300,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <p className={`text-xs mt-3 ${
-              theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'
-            }`}>
+            <p className="text-xs mt-3 text-gray-900">
               No card needed. Free to explore.
             </p>
           </div>
@@ -313,7 +310,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           2. FEATURE CARDS — content-rich, hero overlap
           ══════════════════════════════════════════════ */}
-      <section className={`relative z-20 -mt-14 md:-mt-16 transition-colors duration-300`}>
+      <section id="offerings" className={`relative z-20 -mt-14 md:-mt-16 transition-colors duration-300 scroll-mt-0`}>
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {activeHeroCards.map((item: any, i: number) => {
@@ -562,7 +559,7 @@ export default function Home() {
                   className="w-full h-auto max-h-[380px] object-contain rounded-2xl transition-transform duration-300 hover:scale-[1.02]"
                 />
               </div>
-              <p className="text-center text-sm mt-2 font-bold text-black">
+              <p className={`text-center text-sm mt-2 font-bold ${theme === 'light' ? 'text-black' : 'text-white'}`}>
                 Click this image to see SEO results
               </p>
             </motion.div>
@@ -650,7 +647,7 @@ export default function Home() {
             <p className={`max-w-2xl mx-auto ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>Connect, create, and elevate with peers who share your commitment to excellence.</p>
           </div>
 
-          <div className="relative max-w-3xl mx-auto">
+          <div className="relative">
             {instagramCollab.length > 0 ? (
               <>
                 <button 
@@ -664,7 +661,7 @@ export default function Home() {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <div ref={collabScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden">
+                <div ref={collabScrollRef} className="flex gap-6 overflow-x-auto scroll-smooth pb-2 justify-center [&::-webkit-scrollbar]:hidden">
                   {instagramCollab.map((item, i) => (
                     <motion.div 
                       key={item.name}
@@ -672,7 +669,7 @@ export default function Home() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
-                      className={`flex-shrink-0 w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
+                      className={`flex-shrink-0 w-[calc(50%-12px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] rounded-2xl overflow-hidden border transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#111] border-white/5'}`}
                     >
                       <iframe
                         src={`https://www.instagram.com/${item.type}/${item.reelcode}/embed/`}

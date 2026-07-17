@@ -100,16 +100,8 @@ export const ARTISTS = [
     country: "India",
     image: "/images/artists/sandeep.png",
     bio: "A prominent Bansuri maestro, Sandeep seamlessly blends traditional ragas with contemporary world music elements.",
-    milestones: [
-      { year: "2012", title: "Early Training", description: "Began rigorous training under legendary gurus." },
-      { year: "2017", title: "Global Fusion Project", description: "Collaborated with international jazz artists." },
-      { year: "2020", title: "Digital Concert Series", description: "Pioneered high-quality virtual Indian classical concerts." },
-      { year: "2024", title: "Masterclass Platform", description: "Launched comprehensive online learning portal." },
-    ],
-    awards: [
-      { title: "Karnataka State Arts Award", year: "2021" },
-      { title: "Global Fusion Music Prize", year: "2023" }
-    ],
+    milestones: [],
+    awards: [],
     gallery: [],
     videoPlaceholder: "dQw4w9WgXcQ"
   },

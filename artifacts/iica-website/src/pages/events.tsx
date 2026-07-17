@@ -41,10 +41,19 @@ export default function Events() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Overlays for readability */}
-        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/50' : 'bg-black/50'}`} />
-        <div className={`absolute inset-0 bg-gradient-to-t ${theme === 'light' ? 'from-white via-white/10 to-transparent' : 'from-black via-black/10 to-transparent'}`} />
-        <div className={`absolute inset-0 bg-gradient-to-r ${theme === 'light' ? 'from-white/70 via-transparent to-transparent' : 'from-black/70 via-transparent to-transparent'}`} />
+
+        {/* Summit badge — top left */}
+        <div className="absolute top-5 left-6 z-10">
+          <span className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+            style={{ background: 'rgba(131,58,180,0.6)', color: '#fff', border: '1px solid rgba(255,255,255,0.4)' }}>
+            Summit
+          </span>
+        </div>
+
+
+        {/* Subtle overlay */}
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/20' : 'bg-black/20'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-t ${theme === 'light' ? 'from-white/40 to-transparent' : 'from-black/40 to-transparent'}`} />
 
         {/* Content */}
         <motion.div
@@ -54,19 +63,15 @@ export default function Events() {
           className="relative z-10 h-full flex items-end pb-12"
         >
           <div className="container mx-auto px-6 max-w-xl">
-            <span className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4"
-              style={{ background: '#833AB430', color: '#833AB4', border: '1px solid #833AB450' }}>
-              Summit
-            </span>
-            <h1 className={`font-serif text-3xl md:text-4xl font-bold mb-2 leading-tight ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>
+            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2 leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Annual IICA Global Summit 2025
             </h1>
-            <p className={`text-sm mb-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>
+            <p className="text-sm mb-4 text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
               The confluence of India's greatest classical artists
             </p>
-            <div className={`flex flex-wrap gap-4 text-xs mb-6 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
-              <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#C13584]" />Sept 25–27, 2025</span>
-              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />The Leela Palace, New Delhi</span>
+            <div className="flex flex-wrap gap-4 text-xs mb-6 text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+              <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-white" />Sept 25–27, 2025</span>
+              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-white" />The Leela Palace, New Delhi</span>
             </div>
             <Button onClick={handleBookTicket} className="gradient-bg text-white h-10 px-6 text-sm rounded-md hover:opacity-90 font-semibold">
               <Ticket className="w-4 h-4 mr-2" /> Book Tickets

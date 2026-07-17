@@ -70,12 +70,21 @@ export function Navbar() {
         )}
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/">
-            <span className="font-serif text-3xl font-bold gradient-text cursor-pointer tracking-wider leading-none">
-              IICA
-            </span>
-            <span className="hidden md:block text-[9px] text-gray-500 tracking-[0.25em] uppercase mt-0.5">
-              International Indian Culture &amp; Arts
-            </span>
+            <div className="flex items-center gap-2.5 cursor-pointer">
+              <img
+                src="/images/iica_LOGO.png"
+                alt="IICA Logo"
+                className="h-10 w-auto object-contain"
+              />
+              <div className="flex flex-col leading-none">
+                <span className="font-serif text-3xl font-bold gradient-text tracking-wider leading-none">
+                  I.I.C.A.
+                </span>
+                <span className="hidden md:block text-[9px] text-gray-500 tracking-[0.25em] uppercase mt-0.5">
+                  International Indian Culture &amp; Arts
+                </span>
+              </div>
+            </div>
           </Link>
 
           {/* Desktop Nav */}

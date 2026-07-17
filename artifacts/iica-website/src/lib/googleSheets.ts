@@ -181,7 +181,7 @@ export interface Testimonial { name: string; role: string; quote: string; img: s
 export interface TalkShowVideo { title: string; videoid: string; desc: string; }
 export interface InstagramReel { name: string; reelcode: string; type: string; }
 export interface AwardRecipient { name: string; award: string; year: string; body: string; description: string; reelcode: string; }
-export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; }
+export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; social_media: string; }
 
 /** Parsed award entry from sheet: "name,year" per line */
 export interface ParsedAward { title: string; year: string; }
