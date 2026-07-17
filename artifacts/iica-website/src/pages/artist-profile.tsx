@@ -390,14 +390,15 @@ export default function ArtistProfile() {
             {/* Awards */}
             {mergedAwards.length > 0 && (
               <div className={`border rounded-2xl p-8 transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
-                <h3 className="font-serif text-xl font-bold mb-6 flex items-center gap-2 text-[#d4a853]">
-                  <Trophy className="w-5 h-5" /> Awards & Recognition
+                <h3 className={`font-serif text-xl font-bold mb-6 flex items-center gap-2 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>
+                  <Trophy className="w-5 h-5 text-[#d4a853]" /> Awards & Recognition
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {mergedAwards.map((award, index: number) => (
-                    <div key={index} className={`flex justify-between items-start gap-3 pb-4 last:pb-0 border-b last:border-0 ${theme === 'light' ? 'border-border' : 'border-white/5'}`}>
-                      <span className={`text-sm leading-relaxed ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>{award.title}</span>
-                      <span className="text-[#d4a853] text-sm shrink-0 font-medium">{award.year}</span>
+                    <div key={index} className={`pb-3 last:pb-0 border-b last:border-0 ${theme === 'light' ? 'border-border' : 'border-white/5'}`}>
+                      <span className={`text-sm leading-relaxed break-words ${theme === 'light' ? 'text-foreground' : 'text-gray-300'}`}>
+                        {award.title}{award.year ? `, ${award.year}` : ''}
+                      </span>
                     </div>
                   ))}
                 </div>

@@ -191,9 +191,9 @@ export interface ParsedTimelineEntry { year: string; title: string; description:
 
 /**
  * Parse awards column from Google Sheets.
- * Format: each line is "Award Name,Year"
+ * Format: each line is "Award Name, Year, Location" (3 comma-separated fields).
+ * The third field (location) is discarded.
  * Multiple awards separated by newlines within the cell.
- * Uses the LAST comma on each line to split name from year (names may contain commas).
  */
 export function parseAwards(text: string): ParsedAward[] {
   if (!text || !text.trim()) return [];
@@ -202,14 +202,13 @@ export function parseAwards(text: string): ParsedAward[] {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    const lastComma = trimmed.lastIndexOf(',');
-    if (lastComma === -1) {
-      // No comma — treat entire line as title with empty year
-      awards.push({ title: trimmed, year: '' });
+    const parts = trimmed.split(',').map(p => p.trim());
+    if (parts.length === 1) {
+      // Only award name
+      awards.push({ title: parts[0], year: '' });
     } else {
-      const title = trimmed.slice(0, lastComma).trim();
-      const year = trimmed.slice(lastComma + 1).trim();
-      awards.push({ title, year });
+      // Award Name, Year [, Location...] — discard fields beyond year
+      awards.push({ title: parts[0], year: parts[1] || '' });
     }
   }
   return awards;
