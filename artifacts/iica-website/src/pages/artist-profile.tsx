@@ -168,15 +168,32 @@ export default function ArtistProfile() {
     title: artist.name,
   }));
 
-  // ── Testimonials from artist sheet (comma-separated quotes) ──
+  // ── Testimonials from artist sheet (comma-separated, optional ~ attribution) ──
+  // Format: "Quote text" ~ Attribution Name
+  // Multiple testimonials separated by comma. Use ~ to indicate who gave the testimonial.
   const sheetTestimonials = sheetArtist?.testimonials
     ? sheetArtist.testimonials.split(',').map((q: string) => q.trim()).filter(Boolean)
     : [];
-  const artistTestimonials = sheetTestimonials.map((quote: string) => ({
-    name: artist.name,
-    city: artist.city || artist.country || '',
-    quote,
-  }));
+  const artistTestimonials = sheetTestimonials.map((entry: string) => {
+    // Check if entry contains "~" to separate quote from attribution
+    const tildeIdx = entry.lastIndexOf('~');
+    if (tildeIdx > 0) {
+      const quote = entry.substring(0, tildeIdx).trim().replace(/^[""]|[""]$/g, '');
+      const attribution = entry.substring(tildeIdx + 1).trim();
+      return {
+        name: artist.name,
+        city: artist.city || artist.country || '',
+        quote: quote || entry,
+        attribution,
+      };
+    }
+    // No ~ found — use artist name as before
+    return {
+      name: artist.name,
+      city: artist.city || artist.country || '',
+      quote: entry.replace(/^[""]|[""]$/g, ''),
+    };
+  });
 
   return (
     <div className="bg-background text-foreground min-h-screen pt-24">
@@ -226,10 +243,10 @@ export default function ArtistProfile() {
             <div className={`flex items-center gap-4 text-sm flex-wrap ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>
               <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-[#C13584]" />{artist.city}, {artist.country}</span>
 
-              {/* Social media icons — parsed from social_media column (order: instagram, youtube, facebook) */}
+              {/* Social media icons — parsed from social_media column (order: instagram, facebook, spotify, youtube) */}
               {(() => {
                 const links = ((artist as any).social_media || '').split(',').map((s: string) => s.trim()).filter(Boolean);
-                const [instagram, facebook, youtube] = links;
+                const [instagram, facebook, spotify, youtube] = links;
                 return (
                   <span className="flex items-center gap-3">
                     {instagram && (
@@ -247,6 +264,14 @@ export default function ArtistProfile() {
                         className="hover:opacity-70 transition-opacity" style={{ color: '#1877F2' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.5h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/>
+                        </svg>
+                      </a>
+                    )}
+                    {spotify && (
+                      <a href={spotify} target="_blank" rel="noopener noreferrer" aria-label="Spotify"
+                        className="hover:opacity-70 transition-opacity" style={{ color: '#1DB954' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
                         </svg>
                       </a>
                     )}
