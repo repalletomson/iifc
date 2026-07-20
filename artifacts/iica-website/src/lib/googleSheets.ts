@@ -22,7 +22,7 @@ const CSV_URLS = {
 // and avoid a thundering herd when multiple tabs / F5 refreshes hit Google at once.
 export async function fetchCSV(
   url: string,
-  { timeoutMs = 8000, retries = 2 }: { timeoutMs?: number; retries?: number } = {}
+  { timeoutMs = 12000, retries = 2 }: { timeoutMs?: number; retries?: number } = {}
 ): Promise<string[][]> {
   // Cache-bust only on the first attempt; retries reuse the same busted URL so we
   // don't hammer Google with a unique URL on every retry (CDN can't help on miss).
@@ -39,7 +39,13 @@ export async function fetchCSV(
       return parseCSVFull(text);
     } catch (err) {
       clearTimeout(timer);
-      if (attempt === retries) throw err;
+      if (attempt === retries) {
+        // Distinguish timeout from real errors for better diagnostics
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          throw new Error(`Request timed out after ${timeoutMs}ms (${retries + 1} attempts)`);
+        }
+        throw err;
+      }
       // Exponential backoff + ±30% jitter to avoid thundering-herd on F5 spam:
       // attempt 0→1: ~800ms ±240ms, attempt 1→2: ~1600ms ±480ms
       const base = 800 * (attempt + 1);
@@ -181,7 +187,7 @@ export interface Testimonial { name: string; role: string; quote: string; img: s
 export interface TalkShowVideo { title: string; videoid: string; desc: string; }
 export interface InstagramReel { name: string; reelcode: string; type: string; }
 export interface AwardRecipient { name: string; award: string; year: string; body: string; description: string; reelcode: string; }
-export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; social_media: string; }
+export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; social_media: string; upcomingshows: string; }
 
 /** Parsed award entry from sheet: "name,year" per line */
 export interface ParsedAward { title: string; year: string; }
@@ -371,4 +377,65 @@ export async function fetchHeroCards() {
 export async function fetchJobs(): Promise<Job[]> {
   const rows = await fetchCSV(CSV_URLS.jobs);
   return rowsToObjects(rows) as unknown as Job[];
+}
+
+// ─── Upcoming Shows & Releases (inline in artists sheet) ─────────────────────
+//
+// Format stored in the artist's `upcomingshows` cell — one show per line,
+// pipe-separated fields in this order:
+//   category | description | title | cta_label | cta_url | icon | badge_color
+//
+// Only `category` and `description` are mandatory — the box shows with just those two.
+// All other fields are optional; missing fields simply don't render.
+// Order in the cell = order displayed on the page (top line = first card).
+//
+// Examples:
+//   concert|Live show in Mumbai this December
+//   new_single|Releasing soon on all platforms!|Tere Naal|Subscribe on YouTube|https://youtube.com/@xyz|ti-brand-youtube|red
+
+export interface UpcomingShow {
+  type: string;        // category: new_single | concert | album_launch | workshop | film_release | other
+  subtitle: string;    // description — MANDATORY
+  title: string;       // optional
+  cta_label: string;   // optional
+  cta_url: string;     // optional
+  cta_icon: string;    // optional tabler icon name
+  badge_color: string; // optional: red | blue | purple | green | amber
+}
+
+/**
+ * Parse the `upcomingshows` cell from the artists sheet.
+ * Each line is one show. Fields are pipe-separated.
+ * Line order in the cell = display order on the page.
+ * Returns only entries that have both category (type) and description (subtitle).
+ */
+export function parseUpcomingShows(text: string): UpcomingShow[] {
+  if (!text || !text.trim()) return [];
+  const lines = text.trim().split('\n');
+  const shows: UpcomingShow[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const parts = trimmed.split('|').map(p => p.trim());
+
+    const type     = parts[0] || '';
+    const subtitle = parts[1] || '';
+
+    // Both mandatory fields must be present
+    if (!type || !subtitle) continue;
+
+    shows.push({
+      type,
+      subtitle,
+      title:       parts[2] || '',
+      cta_label:   parts[3] || '',
+      cta_url:     parts[4] || '',
+      cta_icon:    parts[5] || '',
+      badge_color: parts[6] || 'red',
+    });
+  }
+
+  // Preserve line order — no sorting applied
+  return shows;
 }

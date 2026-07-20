@@ -6,10 +6,12 @@ import { Link } from 'wouter';
 import { ARTISTS } from '@/data/artists';
 import { useConfig } from '@/lib/configContext';
 import { useTheme } from '@/lib/themeContext';
-import { extractYoutubeId, parseJourney, parseAwards, parseLifeTimeline } from '@/lib/googleSheets';
+import { extractYoutubeId, parseJourney, parseAwards, parseLifeTimeline, parseUpcomingShows } from '@/lib/googleSheets';
 import type { JourneySection, ParsedAward, ParsedTimelineEntry } from '@/lib/googleSheets';
 import NotFound from './not-found';
 import { ArtistTestimonialsCarousel } from '@/components/sections/ArtistTestimonialsCarousel';
+import { LiteYouTube } from '@/components/ui/LiteYouTube';
+import { UpcomingShowsSection } from '@/components/sections/UpcomingShowsSection';
 
 const ARTIST_AVATARS = [
   "https://images.unsplash.com/photo-1619983081593-e2ba5b543168?w=400&q=80",
@@ -168,32 +170,39 @@ export default function ArtistProfile() {
     title: artist.name,
   }));
 
-  // ── Testimonials from artist sheet (comma-separated, optional ~ attribution) ──
-  // Format: "Quote text" ~ Attribution Name
-  // Multiple testimonials separated by comma. Use ~ to indicate who gave the testimonial.
+  // ── Testimonials from artist sheet (comma-separated) ──
+  // Put the attribution name in quotes at the end:  Great performer "Rajesh Kumar"
+  // Also works with both in quotes:  "Amazing stage presence" "Rajesh Kumar"
+  // Multiple entries separated by comma.
   const sheetTestimonials = sheetArtist?.testimonials
     ? sheetArtist.testimonials.split(',').map((q: string) => q.trim()).filter(Boolean)
     : [];
+  /** Strip surrounding quotes (straight, curly, single, double) from a string */
+  const stripQuotes = (s: string) => s.replace(/^[\u201c\u201d\u2018\u2019\u0022\u0027]+|[\u201c\u201d\u2018\u2019\u0022\u0027]+$/g, '').trim();
+  // Match: "text before" "Attribution Name" — name in quotes at the end
+  // Handles both straight " and curly \u201c \u201d quotes (Google Sheets auto-converts)
+  const ATTR_RE = /^(.*?)\s*[\u201c\u0022]([^\u201d\u0022]*)[\u201d\u0022]\s*$/;
   const artistTestimonials = sheetTestimonials.map((entry: string) => {
-    // Check if entry contains "~" to separate quote from attribution
-    const tildeIdx = entry.lastIndexOf('~');
-    if (tildeIdx > 0) {
-      const quote = entry.substring(0, tildeIdx).trim().replace(/^[""]|[""]$/g, '');
-      const attribution = entry.substring(tildeIdx + 1).trim();
+    const m = entry.match(ATTR_RE);
+    if (m && m[1].trim().length > 0) {
+      // Text before the quoted name → name is the attribution
       return {
         name: artist.name,
         city: artist.city || artist.country || '',
-        quote: quote || entry,
-        attribution,
+        quote: stripQuotes(m[1]) || m[1].trim(),
+        attribution: m[2].trim() || undefined,
       };
     }
-    // No ~ found — use artist name as before
+    // No attribution — whole entry is the quote
     return {
       name: artist.name,
       city: artist.city || artist.country || '',
-      quote: entry.replace(/^[""]|[""]$/g, ''),
+      quote: stripQuotes(entry) || entry,
     };
   });
+
+  // ── Upcoming Shows for this artist — parsed from the artist's own sheet column ──
+  const artistUpcomingShows = parseUpcomingShows(sheetArtist?.upcomingshows || '');
 
   return (
     <div className="bg-background text-foreground min-h-screen pt-24">
@@ -245,11 +254,14 @@ export default function ArtistProfile() {
 
               {/* Social media icons — parsed from social_media column (order: instagram, facebook, spotify, youtube) */}
               {(() => {
-                const links = ((artist as any).social_media || '').split(',').map((s: string) => s.trim()).filter(Boolean);
-                const [instagram, facebook, spotify, youtube] = links;
+                // Split by comma but keep empty slots so positions stay fixed:
+                // index 0 = instagram, 1 = facebook, 2 = spotify, 3 = youtube
+                const raw = ((artist as any).social_media || '').split(',').map((s: string) => s.trim());
+                const isValidUrl = (s: string) => s.startsWith('http://') || s.startsWith('https://');
+                const [instagram, facebook, spotify, youtube] = raw;
                 return (
                   <span className="flex items-center gap-3">
-                    {instagram && (
+                    {isValidUrl(instagram ?? '') && (
                       <a href={instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
                         className="hover:opacity-70 transition-opacity" style={{ color: '#E1306C' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -259,7 +271,7 @@ export default function ArtistProfile() {
                         </svg>
                       </a>
                     )}
-                    {facebook && (
+                    {isValidUrl(facebook ?? '') && (
                       <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
                         className="hover:opacity-70 transition-opacity" style={{ color: '#1877F2' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -267,7 +279,7 @@ export default function ArtistProfile() {
                         </svg>
                       </a>
                     )}
-                    {spotify && (
+                    {isValidUrl(spotify ?? '') && (
                       <a href={spotify} target="_blank" rel="noopener noreferrer" aria-label="Spotify"
                         className="hover:opacity-70 transition-opacity" style={{ color: '#1DB954' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -275,7 +287,7 @@ export default function ArtistProfile() {
                         </svg>
                       </a>
                     )}
-                    {youtube && (
+                    {isValidUrl(youtube ?? '') && (
                       <a href={youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube"
                         className="hover:opacity-70 transition-opacity" style={{ color: '#FF0000' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -293,6 +305,10 @@ export default function ArtistProfile() {
 
       {/* ── Bio + Journey ── */}
       <div className="container mx-auto px-6 py-10">
+
+        {/* Upcoming Shows — full width, above the 3-col grid */}
+        <UpcomingShowsSection shows={artistUpcomingShows} />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
           <div className="lg:col-span-2 space-y-10">
@@ -478,11 +494,9 @@ export default function ArtistProfile() {
                   <div className={`aspect-video rounded-xl overflow-hidden mb-3 ${
                     theme === 'light' ? 'bg-card border border-border' : 'bg-[#111] border border-white/5'
                   }`}>
-                    <iframe width="100%" height="100%"
-                      src={`https://www.youtube.com/embed/${video.videoId}`}
-                      title={video.title} frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen className="w-full h-full"
+                    <LiteYouTube
+                      videoId={video.videoId}
+                      title={video.title}
                     />
                   </div>
                   <h4 className={`font-semibold text-sm ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>{video.title}</h4>

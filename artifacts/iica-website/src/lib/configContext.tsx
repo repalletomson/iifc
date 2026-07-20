@@ -36,9 +36,7 @@ interface ConfigData {
   heroCards: any[];
   jobs: Job[];
   loading: boolean;
-  /** Combined error string when any sheet failed. */
   error: string | null;
-  /** Individual sheet keys that failed, for targeted UI banners. */
   failedSheets: string[];
   refresh: () => void;
 }
@@ -126,7 +124,13 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
         partial[keys[i]] = r.value;
       } else {
         failedSheets.push(keys[i]);
-        console.warn(`⚠️ [ConfigProvider] Failed to fetch sheet "${keys[i]}":`, r.reason);
+        const reason = r.reason;
+        const msg = reason instanceof Error ? reason.message : String(reason);
+        if (msg.includes('timed out') || msg.includes('AbortError')) {
+          console.log(`⏱️ [ConfigProvider] Sheet "${keys[i]}" timed out — Google may be slow. Using fallback data if available.`);
+        } else {
+          console.log(`⚠️ [ConfigProvider] Failed to fetch sheet "${keys[i]}":`, reason);
+        }
       }
     });
 

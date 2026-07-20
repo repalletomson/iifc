@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Find Node.js path",
+			"type": "shell",
+			"command": "cmd /c \"where node 2>nul & echo --- & where npm 2>nul & echo --- & dir /s /b C:\\node.exe 2>nul & echo --- & dir /s /b C:\\Users\\%USERNAME%\\node.exe 2>nul & echo --- & reg query HKEY_LOCAL_MACHINE\\SOFTWARE\\Node.js /v InstallPath 2>nul\""
+		},
+		{
+			"label": "Find Node.js via nvm/fnm",
+			"type": "shell",
+			"command": "cmd /c \"dir /s /b C:\\Users\\%USERNAME%\\AppData\\Roaming\\nvm\\*node.exe 2>nul & echo ---nvm--- & dir /s /b C:\\Users\\%USERNAME%\\AppData\\Local\\fnm*\\node.exe 2>nul & echo ---fnm--- & dir /s /b C:\\Users\\%USERNAME%\\scoop\\apps\\nodejs*\\node.exe 2>nul & echo ---scoop--- & dir /s /b C:\\Users\\%USERNAME%\\.volta\\*node.exe 2>nul & echo ---volta---\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "Find Node.js by searching Program Files",
+			"type": "shell",
+			"command": "cmd /c \"dir /s /b C:\\Progra~1\\nodejs\\node.exe 2>nul & dir /s /b C:\\Progra~2\\nodejs\\node.exe 2>nul & echo DONE\""
+		},
+		{
+			"label": "Find node via PowerShell script",
+			"type": "shell",
+			"command": "powershell -NoProfile -Command \"$nodePath = (Get-Command node -ErrorAction SilentlyContinue).Source; $npmPath = (Get-Command npm -ErrorAction SilentlyContinue).Source; Write-Output \\\"NODE: $nodePath\\\"; Write-Output \\\"NPM: $npmPath\\\"; Write-Output \\\"PATH-node: $($env:Path -split ';' | Where-Object { $_ -like '*node*' })\\\"\""
+		},
+		{
+			"label": "Check bash PATH for node",
+			"type": "shell",
+			"command": "bash -c \"echo $PATH | tr ':' '\\n' | grep -i node; echo '---'; ls -la /c/Program*Files/nodejs/ 2>/dev/null; echo '---'; which node 2>/dev/null || echo 'not found'\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "Run find_node.bat",
+			"type": "shell",
+			"command": "cmd /c \"c:\\Users\\AHC-HYD-LT-273\\Downloads\\iifc\\iifc\\find_node.bat\"",
+			"problemMatcher": []
+		}
+	]
+}

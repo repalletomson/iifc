@@ -7,6 +7,7 @@ export interface TestimonialItem {
   name?: string;
   city?: string;
   quote: string;
+  attribution?: string;
 }
 
 interface ArtistTestimonialsCarouselProps {
@@ -159,6 +160,15 @@ export function ArtistTestimonialsCarousel({ testimonials = [] }: ArtistTestimon
                       >
                         "{card.quote}"
                       </blockquote>
+
+                      {/* Attribution — shown below quote on a new line */}
+                      {card.attribution && (
+                        <p className={`text-center text-xs font-semibold mt-3 not-italic ${
+                          theme === 'light' ? 'text-foreground' : 'text-white'
+                        }`}>
+                          — {card.attribution}
+                        </p>
+                      )}
                     </motion.div>
                   );
                 })}
