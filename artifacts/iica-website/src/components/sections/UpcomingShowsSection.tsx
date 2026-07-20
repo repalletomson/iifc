@@ -123,7 +123,7 @@ export function UpcomingShowsSection({ shows }: UpcomingShowsSectionProps) {
         <span className="w-6 h-[2px] gradient-bg inline-block shrink-0" />
         <div>
           <p className="text-[#C13584] tracking-[0.3em] uppercase text-xs font-medium mb-0.5">
-            What's Coming
+            What's New
           </p>
           <h2 className={`font-serif text-xl font-bold ${
             theme === 'light' ? 'text-foreground' : 'text-white'
