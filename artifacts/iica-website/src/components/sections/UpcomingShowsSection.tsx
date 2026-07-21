@@ -20,15 +20,11 @@ const BADGE_STYLES_LIGHT: Record<string, { bg: string; text: string; dot: string
   amber:  { bg: 'bg-amber-100',     text: 'text-amber-700',   dot: 'bg-amber-600'  },
 };
 
-// ─── Type label map ───────────────────────────────────────────────────────────
-const TYPE_LABELS: Record<string, string> = {
-  new_single:    'New Single',
-  concert:       'Live Concert',
-  album_launch:  'Album Launch',
-  workshop:      'Workshop',
-  film_release:  'Film Release',
-  other:         'Coming Soon',
-};
+/** Convert a raw type string from the sheet into a human-readable badge label. */
+function formatTypeLabel(raw: string): string {
+  if (!raw || !raw.trim()) return 'Coming Soon';
+  return raw.trim();
+}
 
 // ─── Tabler icon renderer (subset we care about) ─────────────────────────────
 function TablerIcon({ name, className = 'w-5 h-5' }: { name: string; className?: string }) {
@@ -137,7 +133,7 @@ export function UpcomingShowsSection({ shows }: UpcomingShowsSectionProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {activeShows.map((show, i) => {
           const badge = badgeMap[show.badge_color] ?? badgeMap['red'];
-          const typeLabel = TYPE_LABELS[show.type] ?? TYPE_LABELS['other'];
+          const typeLabel = formatTypeLabel(show.type);
 
           return (
             <motion.div
