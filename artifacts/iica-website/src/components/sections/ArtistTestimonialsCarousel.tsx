@@ -151,12 +151,6 @@ export function ArtistTestimonialsCarousel({ testimonials = [] }: ArtistTestimon
                         className={`text-center text-sm leading-relaxed italic ${
                           theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'
                         }`}
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 5,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
                       >
                         "{card.quote}"
                       </blockquote>
