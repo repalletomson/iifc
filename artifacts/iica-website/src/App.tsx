@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence } from 'framer-motion';
@@ -21,19 +20,23 @@ function ScrollToTop() {
   return null;
 }
 
-// Pages
-import Home from '@/pages/home';
-import Artists from '@/pages/artists';
-import ArtistProfile from '@/pages/artist-profile';
-import Events from '@/pages/events';
-import Jobs from '@/pages/jobs';
-import About from '@/pages/about';
-import CEO from '@/pages/ceo';
-import IncreaseEarnings from '@/pages/increase-earnings';
-import RelaunchBrand from '@/pages/relaunch-brand';
-import NotFound from "@/pages/not-found";
+// Pages — lazy loaded so each route is a separate JS chunk.
+// The browser only downloads a page's code when the user navigates to it.
+const Home             = React.lazy(() => import('@/pages/home'));
+const Artists          = React.lazy(() => import('@/pages/artists'));
+const ArtistProfile    = React.lazy(() => import('@/pages/artist-profile'));
+const Events           = React.lazy(() => import('@/pages/events'));
+const Jobs             = React.lazy(() => import('@/pages/jobs'));
+const About            = React.lazy(() => import('@/pages/about'));
+const CEO              = React.lazy(() => import('@/pages/ceo'));
+const IncreaseEarnings = React.lazy(() => import('@/pages/increase-earnings'));
+const RelaunchBrand    = React.lazy(() => import('@/pages/relaunch-brand'));
+const NotFound         = React.lazy(() => import('@/pages/not-found'));
 
-const queryClient = new QueryClient();
+// Minimal fallback shown while a page chunk is downloading
+function PageLoader() {
+  return <div className="min-h-screen bg-background" />;
+}
 
 // Error Boundary for catching runtime errors
 class ErrorBoundary extends React.Component<
@@ -72,7 +75,6 @@ class ErrorBoundary extends React.Component<
         </div>
       );
     }
-
     return this.props.children;
   }
 }
@@ -83,20 +85,22 @@ function Router() {
       <ScrollToTop />
       <Navbar />
       <main className="flex-grow">
-        <AnimatePresence mode="wait">
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route path="/artists" component={Artists} />
-            <Route path="/artist/:slug" component={ArtistProfile} />
-            <Route path="/events" component={Events} />
-            <Route path="/jobs" component={Jobs} />
-            <Route path="/about" component={About} />
-            <Route path="/ceo" component={CEO} />
-            <Route path="/increase-earnings" component={IncreaseEarnings} />
-            <Route path="/relaunch-brand" component={RelaunchBrand} />
-            <Route component={NotFound} />
-          </Switch>
-        </AnimatePresence>
+        <Suspense fallback={<PageLoader />}>
+          <AnimatePresence mode="wait">
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/artists" component={Artists} />
+              <Route path="/artist/:slug" component={ArtistProfile} />
+              <Route path="/events" component={Events} />
+              <Route path="/jobs" component={Jobs} />
+              <Route path="/about" component={About} />
+              <Route path="/ceo" component={CEO} />
+              <Route path="/increase-earnings" component={IncreaseEarnings} />
+              <Route path="/relaunch-brand" component={RelaunchBrand} />
+              <Route component={NotFound} />
+            </Switch>
+          </AnimatePresence>
+        </Suspense>
       </main>
       <Footer />
       <WhatsAppFloating />
@@ -109,15 +113,13 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <ConfigProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <DataErrorBanner />
-              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-                <Router />
-              </WouterRouter>
-              <Toaster />
-            </TooltipProvider>
-          </QueryClientProvider>
+          <TooltipProvider>
+            <DataErrorBanner />
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
         </ConfigProvider>
       </ThemeProvider>
     </ErrorBoundary>
