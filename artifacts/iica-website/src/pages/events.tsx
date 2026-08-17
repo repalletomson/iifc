@@ -90,7 +90,7 @@ function EventCard({ event }: { event: Event }) {
 
         <Link href={`/events/${slug}`}>
           <button className="w-full gradient-bg text-white text-xs font-semibold py-2.5 rounded-lg hover:opacity-90 transition-opacity">
-            View & Register →
+            Buy Tickets →
           </button>
         </Link>
       </div>
