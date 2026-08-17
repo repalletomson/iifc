@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import type { Testimonial, TalkShowVideo, InstagramReel, AwardRecipient, SheetArtist, Job } from '@/lib/googleSheets';
+import type { Testimonial, TalkShowVideo, InstagramReel, AwardRecipient, SheetArtist, Job, Event } from '@/lib/googleSheets';
 import {
   fetchTestimonials, fetchTalkShow, fetchInstagramAwards,
   fetchInstagramPromo, fetchInstagramCollab, fetchAwards,
-  fetchArtists, fetchHeroCards, fetchJobs,
+  fetchArtists, fetchHeroCards, fetchJobs, fetchEvents,
 } from '@/lib/googleSheets';
 
 // ─── Cache constants ──────────────────────────────────────────────────────────
-const SESSION_STORAGE_KEY = 'iica-config-cache-v3'; // v3: switched to localStorage for cross-session persistence
+const SESSION_STORAGE_KEY = 'iica-config-cache-v4'; // v4: added events sheet
 /** How long a cache entry stays "fresh" before background revalidation triggers (ms). */
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 /**
@@ -41,6 +41,7 @@ interface ConfigData {
   artists: SheetArtist[];
   heroCards: any[];
   jobs: Job[];
+  events: Event[];
   loading: boolean;
   error: string | null;
   failedSheets: string[];
@@ -50,7 +51,7 @@ interface ConfigData {
 const EMPTY_STATE: Omit<ConfigData, 'refresh'> = {
   testimonials: [], talkShow: [], instagramAwards: [],
   instagramPromo: [], instagramCollab: [], awards: [],
-  artists: [], heroCards: [], jobs: [],
+  artists: [], heroCards: [], jobs: [], events: [],
   loading: true, error: null, failedSheets: [],
 };
 
@@ -178,11 +179,11 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
     // ── Wave 2: deferred data (never blocks render) ────────────────────────
     const deferredKeys = [
       'testimonials', 'talkShow', 'instagramAwards',
-      'instagramPromo', 'instagramCollab', 'awards', 'jobs',
+      'instagramPromo', 'instagramCollab', 'awards', 'jobs', 'events',
     ] as const;
     const deferredFetchers = [
       fetchTestimonials(), fetchTalkShow(), fetchInstagramAwards(),
-      fetchInstagramPromo(), fetchInstagramCollab(), fetchAwards(), fetchJobs(),
+      fetchInstagramPromo(), fetchInstagramCollab(), fetchAwards(), fetchJobs(), fetchEvents(),
     ];
 
     // Fire and forget — deferred wave never shows a loading state

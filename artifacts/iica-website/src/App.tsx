@@ -26,6 +26,7 @@ const Home             = React.lazy(() => import('@/pages/home'));
 const Artists          = React.lazy(() => import('@/pages/artists'));
 const ArtistProfile    = React.lazy(() => import('@/pages/artist-profile'));
 const Events           = React.lazy(() => import('@/pages/events'));
+const EventDetail      = React.lazy(() => import('@/pages/event-detail'));
 const Jobs             = React.lazy(() => import('@/pages/jobs'));
 const About            = React.lazy(() => import('@/pages/about'));
 const CEO              = React.lazy(() => import('@/pages/ceo'));
@@ -92,6 +93,7 @@ function Router() {
               <Route path="/artists" component={Artists} />
               <Route path="/artist/:slug" component={ArtistProfile} />
               <Route path="/events" component={Events} />
+              <Route path="/events/:id" component={EventDetail} />
               <Route path="/jobs" component={Jobs} />
               <Route path="/about" component={About} />
               <Route path="/ceo" component={CEO} />

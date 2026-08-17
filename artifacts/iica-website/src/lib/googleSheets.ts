@@ -12,6 +12,7 @@ const CSV_URLS = {
   artists: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKXgRDO7m1O17pUoCTx49PE7nt9G9UKoc4JxeoOyfECi7kArKKnRy0yW4twqK43ySuXbuq-KpSFg1J/pub?gid=1242756051&single=true&output=csv",
   heroCards: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSXgAuM8u9tTP5M8rrxvoZZ-P44QlklBGGc1TQBxWVf9_6pAFF3LH1J8UTsnrPzY8bIGMEjiyg05sMH/pub?gid=1674246266&single=true&output=csv",
   jobs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRf81aCyWeegLnPdFD_E1ZEWXbWbkMgYGvu4AXp7FFcA57uEboXyQKPe9VL08FILEZFzqj0H0JYa5_L/pub?gid=2122055784&single=true&output=csv",
+  events: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2fc82oBJpM5L4LQoGWQCM4T68wC3pK4tfdNu5Ctf8mFxJbXgrNBb2-GrlW1iMYi2Nww-Vmx6VgivV/pub?gid=1401150943&single=true&output=csv",
 };
 
 // Fetch and parse CSV with proper quoted-field handling (including multi-line fields).
@@ -377,6 +378,47 @@ export async function fetchHeroCards() {
 export async function fetchJobs(): Promise<Job[]> {
   const rows = await fetchCSV(CSV_URLS.jobs);
   return rowsToObjects(rows) as unknown as Job[];
+}
+
+// ─── Events ──────────────────────────────────────────────────────────────────
+//
+// Expected Google Sheet columns (case-insensitive):
+//   id | title | date | venue | city | category | description | image
+//   ticket_link | price | upi_id | qr_image | status | featured
+//
+// image    → path relative to /public, e.g. /images/events/my-event.jpg
+//            OR a full https:// URL
+// qr_image → path to UPI QR code image, e.g. /images/events/upi-qr.png
+//            OR a full https:// URL
+// status   → active | upcoming | past | draft  (anything except "draft"/"past" is shown by default)
+// featured → yes | no
+
+export interface Event {
+  id: string;
+  title: string;
+  date: string;
+  venue: string;
+  city: string;
+  category: string;
+  description: string;
+  image: string;
+  ticket_link: string;
+  price: string;
+  upi_id: string;
+  qr_image: string;
+  status: string;
+  featured: string;
+}
+
+export async function fetchEvents(): Promise<Event[]> {
+  if (!CSV_URLS.events) return [];
+  const rows = await fetchCSV(CSV_URLS.events);
+  const events = rowsToObjects(rows) as unknown as Event[];
+  return events.map(e => ({
+    ...e,
+    image: sanitizeImagePath(e.image),
+    qr_image: sanitizeImagePath(e.qr_image),
+  }));
 }
 
 // ─── Upcoming Shows & Releases (inline in artists sheet) ─────────────────────
