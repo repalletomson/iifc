@@ -131,35 +131,25 @@ export default function ArtistProfile() {
     return <NotFound />;
   }
 
-  const isAniket = artist.slug === 'aniket-chakravarty';
+  const isAniket = false; // local hardcoded sections removed — sheet-only mode
 
-  // Parse journey from Google Sheets (primary), fall back to local data
+  // Parse journey — sheet only
   const journeySections: JourneySection[] = sheetArtist?.journey
     ? parseJourney(sheetArtist.journey)
     : [];
 
-  const hasSheetJourney = journeySections.length > 0;
-  const hasLocalJourney = !!(artist as any).fullBio || !!(artist as any).journey;
-
-  // ── Awards from Google Sheets (comma-separated "name,year" per line) ──
+  // ── Awards — sheet only ──
   const sheetAwards: ParsedAward[] = sheetArtist?.awards
     ? parseAwards(sheetArtist.awards)
     : [];
 
-  // ── Life Timeline from Google Sheets (comma-separated "year,info,subinfo" per line) ──
+  // ── Life Timeline — sheet only ──
   const sheetTimeline: ParsedTimelineEntry[] = sheetArtist?.lifetimeline
     ? parseLifeTimeline(sheetArtist.lifetimeline)
     : [];
 
-  // Merge awards: sheet data takes priority, fall back to local data
-  const mergedAwards: ParsedAward[] = sheetAwards.length > 0
-    ? sheetAwards
-    : ((artist as any).awards || []).map((a: any) => ({ title: a.title, year: a.year }));
-
-  // Merge timeline: sheet data takes priority, fall back to local milestones
-  const mergedTimeline: ParsedTimelineEntry[] = sheetTimeline.length > 0
-    ? sheetTimeline
-    : ((artist as any).milestones || []).map((m: any) => ({ year: m.year, title: m.title, description: m.description }));
+  const mergedAwards    = sheetAwards;
+  const mergedTimeline  = sheetTimeline;
 
   // ── YouTube album from artist sheet (comma-separated URLs) ──
   const youtubeUrls = sheetArtist?.youtubevideo
@@ -312,11 +302,10 @@ export default function ArtistProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
           <div className="lg:col-span-2 space-y-10">
-            {/* Bio / Life Journey */}
+            {/* Bio / Life Journey — sheet data only */}
             <section>
               <SectionHeading>Life Journey</SectionHeading>
-              {hasSheetJourney ? (
-                /* ── Journey from Google Sheets (with ## sub-headings) ── */
+              {journeySections.length > 0 ? (
                 <div className="space-y-8">
                   {journeySections.map((section, si) => (
                     <div key={si}>
@@ -333,73 +322,14 @@ export default function ArtistProfile() {
                     </div>
                   ))}
                 </div>
-              ) : hasLocalJourney ? (
-                /* ── Local rich journey data (Aniket-style) ── */
-                <div className="space-y-6">
-                  {((artist as any).fullBio || [artist.bio]).map((para: string, i: number) => (
-                    <p key={i} className={`leading-relaxed text-[0.95rem] ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>{para}</p>
-                  ))}
-                  {(artist as any).journey && (artist as any).journey.map((para: string, i: number) => (
-                    <p key={`j-${i}`} className={`leading-relaxed text-[0.95rem] ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>{para}</p>
-                  ))}
-                </div>
-              ) : (
-                /* ── Simple bio fallback ── */
-                <p className={`leading-relaxed text-[0.95rem] ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>{artist.bio}</p>
-              )}
+              ) : sheetArtist?.bio ? (
+                <p className={`leading-relaxed text-[0.95rem] ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>
+                  {sheetArtist.bio}
+                </p>
+              ) : null}
             </section>
 
-            {/* Performances */}
-            {isAniket && (artist as any).performances && (
-              <section>
-                <SectionHeading>Selected Performances</SectionHeading>
-                <ul className="space-y-2">
-                  {(artist as any).performances.map((perf: string, i: number) => (
-                    <motion.li
-                      key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.03 }}
-                      className={`flex items-start gap-3 text-sm py-2 border-b last:border-0 ${theme === 'light' ? 'text-muted-foreground border-border' : 'text-gray-400 border-white/5'}`}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full gradient-bg mt-2 shrink-0" />
-                      {perf}
-                    </motion.li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {/* Sur Sadhak Festival */}
-            {isAniket && (artist as any).festival && (
-              <section>
-                <SectionHeading>{(artist as any).festival.title}</SectionHeading>
-                {(artist as any).festival.content.map((para: string, i: number) => (
-                  <p key={i} className={`leading-relaxed mb-4 text-[0.975rem] ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-400'}`}>{para}</p>
-                ))}
-                <p className={`text-xs italic mt-4 pl-4 border-l-2 ${theme === 'light' ? 'text-muted-foreground border-border' : 'text-gray-600 border-white/10'}`}>
-                  The aforementioned content shared about the journey of Aniket Chakravarty is copyright protected and it cannot be shared or distributed without written permission from  IICA.
-                </p>
-              </section>
-            )}
-
-            {/* Press Quotes */}
-            {isAniket && (artist as any).pressQuotes && (
-              <section>
-                <SectionHeading>Press & Media</SectionHeading>
-                <div className="space-y-6">
-                  {(artist as any).pressQuotes.map((q: any, i: number) => (
-                    <blockquote key={i} className="border-l-2 border-[#833AB4] pl-5 py-1">
-                      <p className={`italic text-sm leading-relaxed mb-2 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-300'}`}>"{q.text}"</p>
-                      <cite className={`text-xs not-italic uppercase tracking-wider ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-600'}`}>— {q.source}</cite>
-                    </blockquote>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Life Journey Timeline */}
+            {/* Life Journey Timeline — sheet only */}
             {mergedTimeline.length > 0 && (
               <section>
                 <SectionHeading>Highlights by Timeline</SectionHeading>
@@ -446,17 +376,6 @@ export default function ArtistProfile() {
               </div>
             )}
 
-            {/* Tags */}
-            {isAniket && (
-              <div className={`border rounded-2xl p-8 transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
-                <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${theme === 'light' ? 'text-muted-foreground' : 'text-gray-500'}`}>Genre Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {["#IndianClassical", "#Sarod", "#Hindustani", "#Classical", "#LivePerformance", "#MaiharGharana"].map(tag => (
-                    <span key={tag} className={`text-xs rounded-full px-3 py-1 border ${theme === 'light' ? 'text-muted-foreground border-border bg-muted' : 'text-gray-400 border-white/10 bg-black'}`}>{tag}</span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
         </div>
