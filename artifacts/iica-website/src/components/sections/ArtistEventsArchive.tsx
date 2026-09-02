@@ -149,7 +149,7 @@ export function ArtistEventsArchive({ events }: ArtistEventsArchiveProps) {
             ${isDark ? 'text-white' : 'text-[#1c1a24]'}
           `}
         >
-          Events Archive
+          Concerts & Shows
         </h2>
         <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-[#6c6a75]'}`}>
           Every hall, festival, and stage along the way.
