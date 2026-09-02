@@ -12,12 +12,12 @@ interface NavSection {
 }
 
 const SECTIONS: NavSection[] = [
-  { id: 'whats-new',       label: "What's New",  shortLabel: 'New',      Icon: Bell         },
-  { id: 'highlights',      label: 'Highlights',  shortLabel: 'Timeline', Icon: TrendingUp   },
-  { id: 'events-archive',  label: 'Events',      shortLabel: 'Events',   Icon: CalendarDays },
-  { id: 'awards',          label: 'Awards',      shortLabel: 'Awards',   Icon: Award        },
-  { id: 'watch-listen',    label: 'Watch',       shortLabel: 'Watch',    Icon: PlayCircle   },
-  { id: 'testimonials',    label: 'Reviews',     shortLabel: 'Reviews',  Icon: Star         },
+  { id: 'whats-new',      label: "What's New", shortLabel: 'New',      Icon: Bell         },
+  { id: 'highlights',     label: 'Highlights', shortLabel: 'Timeline', Icon: TrendingUp   },
+  { id: 'events-archive', label: 'Concerts',   shortLabel: 'Concerts', Icon: CalendarDays },
+  { id: 'awards',         label: 'Awards',     shortLabel: 'Awards',   Icon: Award        },
+  { id: 'watch-listen',   label: 'Watch',      shortLabel: 'Watch',    Icon: PlayCircle   },
+  { id: 'testimonials',   label: 'Reviews',    shortLabel: 'Reviews',  Icon: Star         },
 ];
 
 // Matches Navbar h-20
@@ -33,24 +33,13 @@ function scrollToSection(id: string) {
   window.scrollTo({ top, behavior: prefersReduced ? 'auto' : 'smooth' });
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+// ─── Shared active-section hook ───────────────────────────────────────────────
 
-interface ArtistSectionNavProps {
-  /** When true, renders the desktop inline bar (call once, in the page body).
-   *  When false/omitted, renders only the mobile fixed bottom bar. */
-  inline?: boolean;
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
-
-export function ArtistSectionNav({ inline = false }: ArtistSectionNavProps) {
-  const { theme } = useTheme();
+function useActiveSection() {
   const [activeId, setActiveId]       = useState<string>('');
   const [visibleSections, setVisible] = useState<Set<string>>(new Set());
-  const [navbarVisible, setNavbarVisible] = useState(true);
   const observerRef                   = useRef<IntersectionObserver | null>(null);
 
-  // ── IntersectionObserver ──────────────────────────────────────────────────
   const updateActive = useCallback((entries: IntersectionObserverEntry[]) => {
     setVisible(prev => {
       const next = new Set(prev);
@@ -74,92 +63,113 @@ export function ArtistSectionNav({ inline = false }: ArtistSectionNavProps) {
     return () => observerRef.current?.disconnect();
   }, [updateActive]);
 
-  // Mirror the navbar's hide-on-scroll-down / show-on-scroll-up logic
+  useEffect(() => {
+    const ordered = SECTIONS.filter(s => visibleSections.has(s.id));
+    if (ordered.length > 0) setActiveId(ordered[0].id);
+  }, [visibleSections]);
+
+  return activeId;
+}
+
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+interface ArtistSectionNavProps {
+  /** When true, renders the desktop inline bar.
+   *  When false/omitted, renders only the mobile fixed bottom bar. */
+  inline?: boolean;
+}
+
+// ─── DESKTOP strip ────────────────────────────────────────────────────────────
+// Isolated component so its scroll listener never touches the mobile bar.
+
+function DesktopNav() {
+  const { theme }  = useTheme();
+  const activeId   = useActiveSection();
+  const [navbarVisible, setNavbarVisible] = useState(true);
+
+  // Mirror the navbar's hide-on-scroll-down / show-on-scroll-up logic.
+  // Lives here only — never causes mobile bar to re-render.
   useEffect(() => {
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
-      if (y > lastY && y > 100) setNavbarVisible(false);
-      else setNavbarVisible(true);
+      setNavbarVisible(!(y > lastY && y > 100));
       lastY = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Pick the first (topmost) visible section as active
-  useEffect(() => {
-    const ordered = SECTIONS.filter(s => visibleSections.has(s.id));
-    if (ordered.length > 0) setActiveId(ordered[0].id);
-  }, [visibleSections]);
+  const isDark        = theme === 'dark';
+  const activeColor   = '#C13584';
+  const inactiveColor = isDark ? '#6b7280' : '#9ca3af';
+
+  return (
+    <nav
+      aria-label="Jump to section"
+      className={`
+        hidden lg:flex items-center gap-2 flex-wrap
+        sticky z-30
+        px-6 py-3 border-b
+        transition-[top] duration-300
+        ${isDark
+          ? 'bg-background/90 backdrop-blur-md border-white/8'
+          : 'bg-background/90 backdrop-blur-md border-border'}
+      `}
+      style={{ top: navbarVisible ? HEADER_OFFSET : 0 }}
+    >
+      {SECTIONS.map(({ id, label, Icon }) => {
+        const isActive = activeId === id;
+        const color    = isActive ? activeColor : inactiveColor;
+
+        return (
+          <button
+            key={id}
+            onClick={() => scrollToSection(id)}
+            aria-label={label}
+            aria-current={isActive ? 'page' : undefined}
+            className={`
+              flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+              border transition-all duration-200 cursor-pointer
+              ${isActive
+                ? isDark
+                  ? 'border-[#C13584]/40 bg-[#C13584]/10 text-[#C13584]'
+                  : 'border-[#C13584]/30 bg-[#C13584]/8 text-[#C13584]'
+                : isDark
+                  ? 'border-white/8 bg-transparent text-gray-500 hover:border-white/20 hover:text-gray-300'
+                  : 'border-border bg-transparent text-gray-400 hover:border-gray-300 hover:text-foreground'
+              }
+            `}
+          >
+            <Icon
+              width={15}
+              height={15}
+              stroke={color}
+              strokeWidth={1.8}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ flexShrink: 0, transition: 'stroke 0.2s' }}
+            />
+            {label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+// ─── MOBILE bottom bar ────────────────────────────────────────────────────────
+// Completely isolated — no scroll listeners, no navbar-visibility state.
+
+function MobileNav() {
+  const { theme } = useTheme();
+  const activeId  = useActiveSection();
 
   const isDark        = theme === 'dark';
   const activeColor   = '#C13584';
   const inactiveColor = isDark ? '#6b7280' : '#9ca3af';
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // DESKTOP — horizontal inline strip  (shown when inline=true)
-  // Sits in normal page flow, right below the profile header.
-  // ─────────────────────────────────────────────────────────────────────────
-  if (inline) {
-    return (
-      <nav
-        aria-label="Jump to section"
-        className={`
-          hidden lg:flex items-center gap-2 flex-wrap
-          sticky z-30
-          px-6 py-3 border-b
-          transition-[top] duration-300
-          ${isDark
-            ? 'bg-background/90 backdrop-blur-md border-white/8'
-            : 'bg-background/90 backdrop-blur-md border-border'}
-        `}
-        style={{ top: navbarVisible ? HEADER_OFFSET : 0 }}
-      >
-        {SECTIONS.map(({ id, label, Icon }) => {
-          const isActive = activeId === id;
-          const color    = isActive ? activeColor : inactiveColor;
-
-          return (
-            <button
-              key={id}
-              onClick={() => scrollToSection(id)}
-              aria-label={label}
-              aria-current={isActive ? 'page' : undefined}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
-                border transition-all duration-200 cursor-pointer
-                ${isActive
-                  ? isDark
-                    ? 'border-[#C13584]/40 bg-[#C13584]/10 text-[#C13584]'
-                    : 'border-[#C13584]/30 bg-[#C13584]/8 text-[#C13584]'
-                  : isDark
-                    ? 'border-white/8 bg-transparent text-gray-500 hover:border-white/20 hover:text-gray-300'
-                    : 'border-border bg-transparent text-gray-400 hover:border-gray-300 hover:text-foreground'
-                }
-              `}
-            >
-              <Icon
-                width={15}
-                height={15}
-                stroke={color}
-                strokeWidth={1.8}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ flexShrink: 0, transition: 'stroke 0.2s' }}
-              />
-              {label}
-            </button>
-          );
-        })}
-      </nav>
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // MOBILE / TABLET — fixed bottom bar  (<1024px, always rendered)
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <nav
       aria-label="Jump to section"
@@ -209,4 +219,10 @@ export function ArtistSectionNav({ inline = false }: ArtistSectionNavProps) {
       })}
     </nav>
   );
+}
+
+// ─── Public export — thin router ─────────────────────────────────────────────
+
+export function ArtistSectionNav({ inline = false }: ArtistSectionNavProps) {
+  return inline ? <DesktopNav /> : <MobileNav />;
 }
