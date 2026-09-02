@@ -188,7 +188,7 @@ export interface Testimonial { name: string; role: string; quote: string; img: s
 export interface TalkShowVideo { title: string; videoid: string; desc: string; }
 export interface InstagramReel { name: string; reelcode: string; type: string; }
 export interface AwardRecipient { name: string; award: string; year: string; body: string; description: string; reelcode: string; }
-export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; social_media: string; upcomingshows: string; }
+export interface SheetArtist { name: string; slug: string; profession: string; instrument: string; style: string; city: string; country: string; tags: string; bio: string; image: string; journey: string; youtubevideo: string; testimonials: string; awards: string; lifetimeline: string; social_media: string; upcomingshows: string; eventsarchive: string; }
 
 /** Parsed award entry from sheet: "name,year" per line */
 export interface ParsedAward { title: string; year: string; }
@@ -421,7 +421,59 @@ export async function fetchEvents(): Promise<Event[]> {
   }));
 }
 
-// ─── Upcoming Shows & Releases (inline in artists sheet) ─────────────────────
+// ─── Events Archive (inline in artists sheet) ────────────────────────────────
+//
+// Format stored in the artist's `eventsarchive` cell — one event per line,
+// pipe-separated fields in this order:
+//   date | title | tag | venue | description
+//
+// `date` and `title` are mandatory. `date` should be ISO format: YYYY-MM-DD
+// Multiple events separated by newlines within the cell.
+//
+// Example:
+//   2024-12-14|Ganga Aarti Sandhya|Devotional|Varanasi, Uttar Pradesh|Performed devotional originals for a riverside audience.
+//   2023-11-03|Indian Independent Music Awards Showcase|Award Night|Mumbai, Maharashtra|Took the stage in the devotional-category showcase.
+
+export interface ParsedEventEntry {
+  date: string;       // raw date string e.g. "2024-12-14"
+  title: string;
+  tag: string;        // optional category tag
+  venue: string;      // optional venue / city
+  description: string; // optional
+}
+
+/**
+ * Parse the `eventsarchive` cell from the artists sheet.
+ * Each line is one event. Fields are pipe-separated.
+ * Events are returned in the order they appear in the cell.
+ * Returns only entries that have both date and title.
+ */
+export function parseEventsArchive(text: string): ParsedEventEntry[] {
+  if (!text || !text.trim()) return [];
+  const lines = text.trim().split('\n');
+  const events: ParsedEventEntry[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const parts = trimmed.split('|').map(p => p.trim());
+
+    const date  = parts[0] || '';
+    const title = parts[1] || '';
+    if (!date || !title) continue;
+
+    events.push({
+      date,
+      title,
+      tag:         parts[2] || '',
+      venue:       parts[3] || '',
+      description: parts[4] || '',
+    });
+  }
+
+  return events;
+}
+
 //
 // Format stored in the artist's `upcomingshows` cell — one show per line,
 // pipe-separated fields in this order:

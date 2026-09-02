@@ -23,7 +23,14 @@ export function WhatsAppFloating() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+    // On mobile (<lg) push up above the 56px bottom nav bar + 16px clearance.
+    // On desktop (lg+) sit at the normal bottom-6 position.
+    <div
+      className="fixed right-6 z-50 flex flex-col items-end gap-2 lg:bottom-6"
+      style={{
+        bottom: 'calc(56px + env(safe-area-inset-bottom) + 16px)',
+      }}
+    >
       {/* Chat bubble tooltip */}
       <AnimatePresence>
         {showBubble && (

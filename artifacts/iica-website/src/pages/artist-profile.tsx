@@ -6,12 +6,14 @@ import { Link } from 'wouter';
 import { ARTISTS } from '@/data/artists';
 import { useConfig } from '@/lib/configContext';
 import { useTheme } from '@/lib/themeContext';
-import { extractYoutubeId, parseJourney, parseAwards, parseLifeTimeline, parseUpcomingShows } from '@/lib/googleSheets';
+import { extractYoutubeId, parseJourney, parseAwards, parseLifeTimeline, parseUpcomingShows, parseEventsArchive } from '@/lib/googleSheets';
 import type { JourneySection, ParsedAward, ParsedTimelineEntry } from '@/lib/googleSheets';
 import NotFound from './not-found';
 import { ArtistTestimonialsCarousel } from '@/components/sections/ArtistTestimonialsCarousel';
 import { LiteYouTube } from '@/components/ui/LiteYouTube';
 import { UpcomingShowsSection } from '@/components/sections/UpcomingShowsSection';
+import { ArtistSectionNav } from '@/components/sections/ArtistSectionNav';
+import { ArtistEventsArchive } from '@/components/sections/ArtistEventsArchive';
 
 const ARTIST_AVATARS = [
   "https://images.unsplash.com/photo-1619983081593-e2ba5b543168?w=400&q=80",
@@ -194,8 +196,14 @@ export default function ArtistProfile() {
   // ── Upcoming Shows for this artist — parsed from the artist's own sheet column ──
   const artistUpcomingShows = parseUpcomingShows(sheetArtist?.upcomingshows || '');
 
+  // ── Events Archive — parsed from the artist's own sheet column ──
+  const artistEventsArchive = parseEventsArchive(sheetArtist?.eventsarchive || '');
+
   return (
-    <div className="bg-background text-foreground min-h-screen pt-24">
+    <div className="bg-background text-foreground min-h-screen pt-24 pb-16 lg:pb-0">
+
+      {/* Mobile bottom bar (hidden on desktop) */}
+      <ArtistSectionNav />
 
       {/* ── Compact horizontal header: circle photo + details ── */}
       <div className={`container mx-auto px-6 pb-10 border-b transition-colors ${theme === 'light' ? 'border-border' : 'border-white/8'}`}>
@@ -293,17 +301,22 @@ export default function ArtistProfile() {
         </div>
       </div>
 
+      {/* ── Desktop section nav — horizontal inline strip below header ── */}
+      <ArtistSectionNav inline />
+
       {/* ── Bio + Journey ── */}
       <div className="container mx-auto px-6 py-10">
 
         {/* Upcoming Shows — full width, above the 3-col grid */}
-        <UpcomingShowsSection shows={artistUpcomingShows} />
+        <div id="whats-new">
+          <UpcomingShowsSection shows={artistUpcomingShows} />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
           <div className="lg:col-span-2 space-y-10">
             {/* Bio / Life Journey — sheet data only */}
-            <section>
+            <section id="life-journey">
               <SectionHeading>Life Journey</SectionHeading>
               {journeySections.length > 0 ? (
                 <div className="space-y-8">
@@ -331,7 +344,7 @@ export default function ArtistProfile() {
 
             {/* Life Journey Timeline — sheet only */}
             {mergedTimeline.length > 0 && (
-              <section>
+              <section id="highlights">
                 <SectionHeading>Highlights by Timeline</SectionHeading>
                 <div className={`relative ml-3 space-y-10 ${theme === 'light' ? 'border-l border-border' : 'border-l border-white/10'}`}>
                   {mergedTimeline.map((entry, index: number) => (
@@ -352,6 +365,11 @@ export default function ArtistProfile() {
               </section>
             )}
 
+            {/* Events Archive — sheet only */}
+            {artistEventsArchive.length > 0 && (
+              <ArtistEventsArchive events={artistEventsArchive} />
+            )}
+
             {/* ── YouTube Album Carousel ── */}
           </div>
 
@@ -360,7 +378,7 @@ export default function ArtistProfile() {
 
             {/* Awards */}
             {mergedAwards.length > 0 && (
-              <div className={`border rounded-2xl p-8 transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
+              <div id="awards" className={`border rounded-2xl p-8 transition-colors ${theme === 'light' ? 'bg-card border-border' : 'bg-[#0a0a0a] border-white/8'}`}>
                 <h3 className={`font-serif text-xl font-bold mb-6 flex items-center gap-2 ${theme === 'light' ? 'text-foreground' : 'text-white'}`}>
                   <Trophy className="w-5 h-5 text-[#d4a853]" /> Awards & Recognition
                 </h3>
@@ -383,7 +401,7 @@ export default function ArtistProfile() {
 
       {/* ═══ {artist.name} Album — YouTube Video Carousel ═══ */}
       {youtubeVideos.length > 0 && (
-        <section className={`py-16 transition-colors duration-300 ${
+        <section id="watch-listen" className={`py-16 transition-colors duration-300 ${
           theme === 'light'
             ? 'bg-muted border-t border-border'
             : 'bg-black border-t border-white/5'
@@ -428,7 +446,9 @@ export default function ArtistProfile() {
       )}
 
       {/* ═══ Testimonials Carousel ═══ */}
-      <ArtistTestimonialsCarousel testimonials={artistTestimonials} />
+      <div id="testimonials">
+        <ArtistTestimonialsCarousel testimonials={artistTestimonials} />
+      </div>
 
     </div>
   );
