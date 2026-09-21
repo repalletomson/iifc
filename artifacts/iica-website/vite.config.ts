@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 
 const BASE_URL = 'https://www.iica.app';
-const DEFAULT_OG_IMAGE = `${BASE_URL}/opengraph.jpg`;
+const DEFAULT_OG_IMAGE = `${BASE_URL}/opengraph.png`;
 
 // Per-route meta configuration for social sharing
 const ROUTE_META: Record<string, { title: string; description: string; image?: string; url: string }> = {
@@ -60,7 +60,7 @@ function buildMetaTags(meta: typeof ROUTE_META[string]): string {
     <meta property="og:image" content="${image}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:url" content="${meta.url}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="IICA" />
